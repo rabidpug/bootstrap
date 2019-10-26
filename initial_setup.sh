@@ -80,9 +80,13 @@ usermod -aG docker "${USERNAME}"
 git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
-curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc -o "${home_directory}/.antigenrc"
-curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/docker-compose.yml -o "${home_directory}/docker/docker-compose.yml"
-curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/volumes -o "${home_directory}/docker/volumes"
+
+git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/.bootstrap"
+mv "${home_directory}/.bootstrap/.antigenrc" "${home_directory}/.antigenrc"
+mkdir "${home_directory}/docker"
+mv "${home_directory}/.bootstrap/docker-compose.yml" "${home_directory}/docker/docker-compose.yml"
+mv "${home_directory}/.bootstrap/volumes" "${home_directory}/docker/volumes"
+rm -rf "${home_directory}/.bootstrap"
 
 "${home_directory}/.fzf/install" --all
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"

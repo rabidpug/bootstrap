@@ -3,24 +3,25 @@ services:
   reverse-proxy:
     image: traefik:v2.0
     container_name: reverse-proxy
+    restart: always
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - volumes/reverse-proxy/traefik.yaml:/etc/traefik/traefik.yaml
-      - volumes/reverse-proxy/acme.json:/acme.json
+      - ./volumes/reverse-proxy/traefik.yaml:/etc/traefik/traefik.yaml
+      - ./volumes/reverse-proxy/acme.json:/acme.json
     env_file: traefik.env
   gitlab:
     image: gitlab/gitlab-ce
     container_name: gitlab
+    restart: always
+    hostname: jcuneo.com
     volumes:
-      - volumes/gitlab/gitlab:/etc/gitlab
-      - volumes/gitlab/log:/var/log/gitlab
-      - volumes/gitlab/opt:/var/opt/gitlab
-    command:
-      - --hostname=jcuneo.com
+      - ./volumes/gitlab/gitlab:/etc/gitlab
+      - ./volumes/gitlab/log:/var/log/gitlab
+      - ./volumes/gitlab/opt:/var/opt/gitlab
     labels:
       - traefik.enabled=true
       - traefik.http.routers.gitlab.rule=Host('jcuneo.com','www.jcuneo.com')
@@ -30,11 +31,11 @@ services:
     image: gitlab/gitlab-runner
     container_name: gitlab-runner-1
     volumes:
-      - volumes/gitlab/runner-1:/etc/gitlab-runner
+      - ./volumes/gitlab/runner-1:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
   gitlab-runner-2:
     image: gitlab/gitlab-runner
     container_name: gitlab-runner-2
     volumes:
-      - volumes/gitlab/runner-2:/etc/gitlab-runner
+      - ./volumes/gitlab/runner-2:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
