@@ -6,7 +6,7 @@ set -euo pipefail
 ########################
 
 # Name of the user to create and grant sudo privileges
-USERNAME=$1
+USERNAME=m
 
 OTHER_PUBLIC_KEYS_TO_ADD=(
     "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxvSWFu4ljGMFdtmbZWKjc+NZxjW74RENIeFqCXQRJZb/VS3wXh/dHev973/fdO73Ma4vv1bkLBtmornKeu7kjTet6o+Dpup7sVoBqZ1ilvBTHVIlOHKpmDJ5sxU22AnMEXwBQPRvK10mKFkQ7m/l/KxGEy84+oiZeTiamAPXYFsZrKJ68mSKUZCBhGgjEPc0l4hS8QHuZeqX/aIVwapfNADuMSYKJTHV90mcMCuj4C5CY3CnSwQba9WE6yg3D/HdzqR6/NAs/X9VQWOvp8wk92Sqjk0Bn6gCvCdxQDdnz4t5dMa823d4Wy3S4imUtVKKvJz8DsYJgKltuPx+ZNKiZ matt@Matts-MacBook-Pro.local"
@@ -81,6 +81,7 @@ usermod -aG docker "${USERNAME}"
 git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
+curl -H 'Accept: application/vnd.github.v3.raw' https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc > "${home_directory}/.antigenrc"
 
 "${home_directory}/.fzf/install" --all
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
