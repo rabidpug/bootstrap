@@ -2,6 +2,7 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.0
+    container_name: reverse-proxy
     ports:
       - "80:80"
       - "443:443"
@@ -10,5 +11,30 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - volumes/reverse-proxy/traefik.yaml:/etc/traefik/traefik.yaml
       - volumes/reverse-proxy/acme.json:/acme.json
-    environment:
-      - DO_AUTH_TOKEN_FILE=/run/secrets/traefik_do-auth-token
+    env_file: traefik.env
+  gitlab:
+    image: gitlab/gitlab-ce
+    container_name: gitlab
+    volumes:
+      - volumes/gitlab/gitlab:/etc/gitlab
+      - volumes/gitlab/log:/var/log/gitlab
+      - volumes/gitlab/opt:/var/opt/gitlab
+    command:
+      - --hostname=jcuneo.com
+    labels:
+      - traefik.enabled=true
+      - traefik.http.routers.gitlab.rule=Host('jcuneo.com','www.jcuneo.com')
+      - traefik.http.routers.gitlab.entrypoints=websecure
+      - traefik.http.routers.gitlab.tls.certresolver=master
+  gitlab-runner-1:
+    image: gitlab/gitlab-runner
+    container_name: gitlab-runner-1
+    volumes:
+      - volumes/gitlab/runner-1:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+  gitlab-runner-2:
+    image: gitlab/gitlab-runner
+    container_name: gitlab-runner-2
+    volumes:
+      - volumes/gitlab/runner-2:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock

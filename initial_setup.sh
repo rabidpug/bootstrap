@@ -6,15 +6,13 @@ set -euo pipefail
 ########################
 
 # Name of the user to create and grant sudo privileges
-USERNAME=m
+USERNAME=***USERNAME***
 
 OTHER_PUBLIC_KEYS_TO_ADD=(
-    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxvSWFu4ljGMFdtmbZWKjc+NZxjW74RENIeFqCXQRJZb/VS3wXh/dHev973/fdO73Ma4vv1bkLBtmornKeu7kjTet6o+Dpup7sVoBqZ1ilvBTHVIlOHKpmDJ5sxU22AnMEXwBQPRvK10mKFkQ7m/l/KxGEy84+oiZeTiamAPXYFsZrKJ68mSKUZCBhGgjEPc0l4hS8QHuZeqX/aIVwapfNADuMSYKJTHV90mcMCuj4C5CY3CnSwQba9WE6yg3D/HdzqR6/NAs/X9VQWOvp8wk92Sqjk0Bn6gCvCdxQDdnz4t5dMa823d4Wy3S4imUtVKKvJz8DsYJgKltuPx+ZNKiZ matt@Matts-MacBook-Pro.local"
+    ***PUBLIC_KEYS***
 )
 
-# Whether to copy over the root user's `authorized_keys` file to the new sudo
-# user.
-COPY_AUTHORIZED_KEYS_FROM_ROOT=true
+DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
 ####################
 ### SCRIPT LOGIC ###
@@ -44,10 +42,7 @@ chage --lastday 0 "${USERNAME}"
 home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 
-# Copy `authorized_keys` file from root if requested
-if [ "${COPY_AUTHORIZED_KEYS_FROM_ROOT}" = true ]; then
-    cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
-fi
+cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
 # Add additional provided public keys
 for pub_key in "${OTHER_PUBLIC_KEYS_TO_ADD[@]}"; do
@@ -85,8 +80,12 @@ usermod -aG docker "${USERNAME}"
 git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
-curl -H 'Accept: application/vnd.github.v3.raw' https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc -o "${home_directory}/.antigenrc"
+curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc -o "${home_directory}/.antigenrc"
+curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/docker-compose.yml -o "${home_directory}/docker/docker-compose.yml"
+curl https://raw.githubusercontent.com/rabidpug/bootstrap/master/volumes -o "${home_directory}/docker/volumes"
 
 "${home_directory}/.fzf/install" --all
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
 usermod -s $(which zsh) ${USERNAME}
+
+echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/traefik.env"

@@ -11,7 +11,7 @@ certificatesResolvers:
       dnsChallenge:
         provider: digitalocean
         delayBeforeCheck: 0
-entrypoints:
+entryPoints:
   web:
     address: :80
   webSecure:
