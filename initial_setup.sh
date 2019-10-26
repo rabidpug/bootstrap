@@ -71,17 +71,21 @@ ufw allow OpenSSH
 ufw --force enable
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+curl https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
+add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
+
+
 
 apt update
 apt --assume-yes upgrade
-apt --assume-yes install zsh python docker-ce docker-compose
+apt --assume-yes install zsh python docker-ce docker-compose do-agent
 usermod -aG docker "${USERNAME}"
 
 git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
-curl -H 'Accept: application/vnd.github.v3.raw' https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc > "${home_directory}/.antigenrc"
+curl -H 'Accept: application/vnd.github.v3.raw' https://raw.githubusercontent.com/rabidpug/bootstrap/master/.antigenrc -o "${home_directory}/.antigenrc"
 
 "${home_directory}/.fzf/install" --all
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
