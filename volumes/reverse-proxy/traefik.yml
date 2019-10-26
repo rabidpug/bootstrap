@@ -1,0 +1,18 @@
+providers:
+  docker:
+    exposedByDefault: false
+api:
+  insecure: true
+certificatesResolvers:
+  master:
+    acme:
+      email: m@jcuneo.com
+      storage: acme.json
+      dnsChallenge:
+        provider: digitalocean
+        delayBeforeCheck: 0
+entrypoints:
+  web:
+    address: :80
+  webSecure:
+    address: :443
