@@ -1,8 +1,6 @@
 providers:
   docker:
     network: web
-  file:
-    filename: insecure-redirect.yml
 api:
 certificatesResolvers:
   master:

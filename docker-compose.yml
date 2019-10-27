@@ -2,7 +2,8 @@ version: "3"
 services:
   reverse-proxy:
     image: traefik:v2.0
-    container_name: reverse-proxy
+    networks:
+      - web
     restart: always
     ports:
       - "80:80"
@@ -13,9 +14,22 @@ services:
       - ./volumes/reverse-proxy/traefik.yml:/etc/traefik/traefik.yml
       - ./volumes/reverse-proxy/letsencrypt:/letsencrypt
     env_file: traefik.env
+    labels:
+      - traefik.http.middlewares.insecure-redirect.redirect-scheme.scheme=https
+      - traefik.http.middlewares.admin.basicauth.users=admin:password
+      - traefik.http.routers.insecure-redirect.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.insecure-redirect.entrypoints=web
+      - traefik.http.routers.insecure-redirect.middlewares=insecure-redirect
+      - traefik.http.routers.traefik.rule=Host(`router.jcuneo.com`)
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=admin
+      - traefik.http.routers.traefik.entrypoints=webSecure
+      - traefik.http.routers.traefik.tls.certResolver=master
   repo:
     image: gitlab/gitlab-ce
-    container_name: repo
+    networks:
+      - web
+      - internal
     restart: always
     hostname: jcuneo.com
     volumes:
@@ -23,23 +37,27 @@ services:
       - ./volumes/repo/log:/var/log/gitlab
       - ./volumes/repo/opt:/var/opt/gitlab
     labels:
-      - traefik.enable=true
       - traefik.http.routers.repo.rule=Host(`jcuneo.com`,`www.jcuneo.com`)
       - traefik.http.routers.repo.entrypoints=webSecure
-      - traefik.http.routers.repo.tls=true
-      - traefik.http.routers.repo.tls.certresolver=master
-      - traefik.http.routers.repo-r.rule=Host(`jcuneo.com`,`www.jcuneo.com`)
-      - traefik.http.middlewares.ws-redirect.redirectscheme.scheme=https
-      - traefik.http.routers.repo-r.middlewares=ws-redirect
+      - traefik.http.routers.repo.tls.certResolver=master
   gitlab-runner-1:
     image: gitlab/gitlab-runner
-    container_name: gitlab-runner-1
+    networks:
+      - internal
     volumes:
       - ./volumes/repo/runner-1:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
   gitlab-runner-2:
     image: gitlab/gitlab-runner
-    container_name: gitlab-runner-2
+    networks:
+      - internal
     volumes:
       - ./volumes/repo/runner-2:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+      
+      
+networks:
+  web:
+    internal: false
+  internal:
+    internal: true
