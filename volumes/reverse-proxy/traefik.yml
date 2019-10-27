@@ -1,8 +1,7 @@
 providers:
   docker:
-    exposedByDefault: false
+    network: web
 api:
-  insecure: true
 certificatesResolvers:
   master:
     acme:
@@ -16,3 +15,23 @@ entryPoints:
     address: :80
   webSecure:
     address: :443
+http:
+  middlewares:
+    secure-redirect:
+      redirect-scheme:
+        scheme: https
+    admin:
+      basicauth:
+        users: admin:password
+  routers:
+    secure-redirect:
+      rule: hostregexp(`{host:.+}`)
+      entrypoints: web
+      middlewares: secure-redirect
+    traefik:
+      rule: Host(`router.jcuneo.com`)
+      service: api@internal
+      middlewares: admin
+      entrypoints: webSecure
+      tls:
+        certResolver: master
