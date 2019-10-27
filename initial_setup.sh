@@ -56,6 +56,7 @@ chown --recursive "${USERNAME}":"${USERNAME}" "${home_directory}/.ssh"
 
 # Disable root SSH login with password
 sed --in-place 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
+# Disable all SSH login with password
 sed --in-place 's/^PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
 if sshd -t -q; then
     systemctl restart sshd
@@ -65,30 +66,32 @@ fi
 ufw allow OpenSSH
 ufw --force enable
 
+# Add docker and digital ocean agent repos
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 curl https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
 add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
 
 
-
+# update and install apps
 apt update
 apt --assume-yes upgrade
 apt --assume-yes install zsh python docker-ce docker-compose do-agent
 usermod -aG docker "${USERNAME}"
 
+# Clone & install antigen and fzf
 git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
+"${home_directory}/.fzf/install" --all
 
+# personal bootstrap
 git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/.bootstrap"
 mv "${home_directory}/.bootstrap/.antigenrc" "${home_directory}/.antigenrc"
 mkdir "${home_directory}/docker"
 mv "${home_directory}/.bootstrap/docker-compose.yml" "${home_directory}/docker/docker-compose.yml"
 mv "${home_directory}/.bootstrap/volumes" "${home_directory}/docker/volumes"
 rm -rf "${home_directory}/.bootstrap"
-
-"${home_directory}/.fzf/install" --all
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
 usermod -s $(which zsh) ${USERNAME}
 
