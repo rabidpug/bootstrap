@@ -15,9 +15,9 @@ services:
       - ./volumes/reverse-proxy/letsencrypt:/letsencrypt
     env_file: traefik.env
     labels:
-      - traefik.http.middlewares.insecure-redirect.redirect-scheme.scheme=https
+      - traefik.http.middlewares.insecure-redirect.redirectScheme.scheme=https
       - traefik.http.middlewares.admin.basicauth.users=admin:password
-      - traefik.http.routers.insecure-redirect.rule=hostregexp(`{host:.+}`)
+      - traefik.http.routers.insecure-redirect.rule=hostregexp(`{any:.+}`)
       - traefik.http.routers.insecure-redirect.entrypoints=web
       - traefik.http.routers.insecure-redirect.middlewares=insecure-redirect
       - traefik.http.routers.traefik.rule=Host(`router.jcuneo.com`)
