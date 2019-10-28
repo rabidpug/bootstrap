@@ -3,8 +3,9 @@ providers:
     network: web
     exposedByDefault: false
   file:
-    filename: /etc/traefik/insecure-redirect.yml
+    filename: /etc/traefik/provider.yml
 api:
+  dashboard: true
 certificatesResolvers:
   master:
     acme:

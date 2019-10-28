@@ -10,8 +10,14 @@ http:
       service: insecure-redirect
       middlewares:
         - insecure-redirect
+    traefik:
+      rule: Host(`router.jcuneo.com`)
+      entrypoints: webSecure
+      service: api@internal
+      tls:
+        certResolver: master
   services:
     insecure-redirect:
       loadBalancer:
         servers:
-          url: ""
+          - url: ""
