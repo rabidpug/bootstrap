@@ -88,16 +88,16 @@ echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
 "${home_directory}/.fzf/install" --all
 
 # personal bootstrap
-git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/.bootstrap"
+git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/bootstrap"
 
 # Move antigen config
-mv "${home_directory}/.bootstrap/.antigenrc" "${home_directory}/.antigenrc"
+mv "${home_directory}/bootstrap/.antigenrc" "${home_directory}/.antigenrc"
 
 # Move docker config
-mv "${home_directory}/.bootstrap/docker" "${home_directory}/docker"
+mv "${home_directory}/bootstrap/docker" "${home_directory}/docker"
 
 # remove personal bootstrap
-rm -rf "${home_directory}/.bootstrap"
+rm -rf "${home_directory}/bootstrap"
 
 # Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
