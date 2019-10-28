@@ -15,11 +15,11 @@ services:
       - ./data/traefik/letsencrypt:/letsencrypt
     env_file: traefik.env
     labels:
-      traefik.enable: true
-      traefik.http.routers.traefik.rule: Host(`router.jcuneo.com`)
-      traefik.http.routers.traefik.service: api@internal
-      traefik.http.routers.traefik.entrypoints: webSecure
-      traefik.http.routers.traefik.tls.certResolver: master
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`router.jcuneo.com`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=webSecure"
+      - "traefik.http.routers.traefik.tls.certResolver=master"
   gitlab:
     image: gitlab/gitlab-ce
     networks:
@@ -32,10 +32,10 @@ services:
       - ./data/gitlab/log:/var/log/gitlab
       - ./data/gitlab/opt:/var/opt/gitlab
     labels:
-      traefik.enable: true
-      traefik.http.routers.repo.rule: Host(`jcuneo.com`,`www.jcuneo.com`)
-      traefik.http.routers.repo.entrypoints: webSecure
-      traefik.http.routers.repo.tls.certResolver: master
+      - "traefik.enable=true"
+      - "traefik.http.routers.repo.rule=Host(`jcuneo.com`,`www.jcuneo.com`)"
+      - "traefik.http.routers.repo.entrypoints=webSecure"
+      - "traefik.http.routers.repo.tls.certResolver=master"
   gitlab-runner-1:
     image: gitlab/gitlab-runner
     networks:
