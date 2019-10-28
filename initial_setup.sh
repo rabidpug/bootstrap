@@ -77,6 +77,8 @@ add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ ma
 apt update
 apt --assume-yes upgrade
 apt --assume-yes install zsh python docker-ce docker-compose do-agent
+
+# Add user to docker group
 usermod -aG docker "${USERNAME}"
 
 # Clone & install antigen and fzf
@@ -87,12 +89,20 @@ echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
 
 # personal bootstrap
 git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/.bootstrap"
+
+# Move antigen config
 mv "${home_directory}/.bootstrap/.antigenrc" "${home_directory}/.antigenrc"
-mkdir "${home_directory}/docker"
-mv "${home_directory}/.bootstrap/docker-compose.yml" "${home_directory}/docker/docker-compose.yml"
-mv "${home_directory}/.bootstrap/volumes" "${home_directory}/docker/volumes"
+
+# Move docker config
+mv "${home_directory}/.bootstrap/docker" "${home_directory}/docker"
+
+# remove personal bootstrap
 rm -rf "${home_directory}/.bootstrap"
+
+# Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
+
+# Change default shell to ZSH
 usermod -s $(which zsh) ${USERNAME}
 
 echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/traefik.env"

@@ -1,0 +1,59 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:v2.0
+    networks:
+      - web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./configs/traefik:/etc/traefik
+      - ./data/traefik/letsencrypt:/letsencrypt
+    env_file: traefik.env
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: Host(`router.jcuneo.com`)
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.entrypoints: webSecure
+      traefik.http.routers.traefik.tls.certResolver: master
+  gitlab:
+    image: gitlab/gitlab-ce
+    networks:
+      - web
+      - internal
+    restart: always
+    hostname: jcuneo.com
+    volumes:
+      - ./configs/gitlab:/etc/gitlab
+      - ./data/gitlab/log:/var/log/gitlab
+      - ./data/gitlab/opt:/var/opt/gitlab
+    labels:
+      traefik.enable: true
+      traefik.http.routers.repo.rule: Host(`jcuneo.com`,`www.jcuneo.com`)
+      traefik.http.routers.repo.entrypoints: webSecure
+      traefik.http.routers.repo.tls.certResolver: master
+  gitlab-runner-1:
+    image: gitlab/gitlab-runner
+    networks:
+      - internal
+    volumes:
+      - ./volumes/repo/runner-1:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+  gitlab-runner-2:
+    image: gitlab/gitlab-runner
+    networks:
+      - internal
+    volumes:
+      - ./volumes/repo/runner-2:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      
+networks:
+  web:
+    external: true
+  internal:
+    internal: true

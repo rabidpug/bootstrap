@@ -1,6 +1,9 @@
 providers:
   docker:
     network: web
+    exposedByDefault: false
+  file:
+    filename: /etc/traefik/insecure-redirect.yml
 api:
 certificatesResolvers:
   master:

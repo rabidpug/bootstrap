@@ -1,0 +1,17 @@
+http:
+  middlewares:
+    insecure-redirect:
+      redirectScheme:
+        scheme: https
+  routers:
+    insecure-redirect:
+      rule: hostregexp(`{any:.+}`)
+      entrypoints: web
+      service: insecure-redirect
+      middlewares:
+        - insecure-redirect
+  services:
+    insecure-redirect:
+      loadBalancer:
+        servers:
+          url: ""
