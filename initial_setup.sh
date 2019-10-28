@@ -8,7 +8,7 @@ set -euo pipefail
 # Name of the user to create and grant sudo privileges
 USERNAME=***USERNAME***
 
-OTHER_PUBLIC_KEYS_TO_ADD=(
+PUBLIC_KEYS_TO_ADD=(
     ***PUBLIC_KEYS***
 )
 
@@ -45,7 +45,7 @@ mkdir --parents "${home_directory}/.ssh"
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
 # Add additional provided public keys
-for pub_key in "${OTHER_PUBLIC_KEYS_TO_ADD[@]}"; do
+for pub_key in "${PUBLIC_KEYS_TO_ADD[@]}"; do
     echo "${pub_key}" >> "${home_directory}/.ssh/authorized_keys"
 done
 
