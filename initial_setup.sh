@@ -83,7 +83,6 @@ chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
-sysctl vm.swapiness=10
 
 # Add docker and digital ocean agent repos
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -128,8 +127,9 @@ echo "${USERNAME}:$(openssl passwd -apr1 "${ADMIN_PASSWD}")" > "${home_directory
 curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
 
 # Generate secret key for Sentry
-
-echo "system.secret-key: '$(docker run --rm sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
+SENTRY_SECRET_KEY=$(docker run --rm sentry config generate-secret-key)
+echo "system.secret-key: '${SENTRY_SECRET_KEY}'" >> "${home_directory}/docker/services/sentry/config/config.yml"
+echo "SENTRY_SECRET_KEY=${SENTRY_SECRET_KEY}" >> "${home_directory}/docker/services/sentry/.env"
 
 # Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
