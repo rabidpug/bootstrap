@@ -5,15 +5,23 @@ set -euo pipefail
 ### SCRIPT VARIABLES ###
 ########################
 
-# Name of the user to create and grant sudo privileges
+## USED FOR:
+# Linux sudo user
+# Traefik dashboard user
 USERNAME=***USERNAME***
 
+## USED FOR:
+# Traefik dashboard password
 ADMIN_PASSWD=***ADMIN_PASSWD***
 
+## USED FOR:
+# SSH authorized keys
 PUBLIC_KEYS_TO_ADD=(
     ***PUBLIC_KEYS***
 )
 
+## USED FOR:
+# Traefik acme dns challenge
 DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
 ####################
@@ -44,6 +52,7 @@ chage --lastday 0 "${USERNAME}"
 home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 
+# Copy root account public keys
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
 # Add additional provided public keys
@@ -64,11 +73,11 @@ if sshd -t -q; then
     systemctl restart sshd
 fi
 
-# Add exception for SSH and then enable UFW firewall
+# Add firewall exception for SSH and then enable UFW firewall
 ufw allow OpenSSH
 ufw --force enable
 
-# Create swapfile to avoid OOM
+# Create swapfile to avoid docker OOM
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
@@ -115,12 +124,11 @@ echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/services/traef
 # Add user and password for access to traefik dashboard
 echo "${USERNAME}:$(openssl passwd -apr1 "${ADMIN_PASSWD}")" > "${home_directory}/docker/services/traefik/config/users.pw"
 
-# download config files for Sentry
-curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/docker-entrypoint.sh -o "${home_directory}/docker/services/sentry/config/docker-entrypoint.sh"
+# download config file for Sentry
 curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
 
 # Generate secret key for Sentry
-echo "SENTRY_SECRET_KEY=$(docker run --rm getsentry/sentry config generate-secret-key)" > "${home_directory}/docker/services/sentry/.env"
+echo "system.secret-key: '$(docker run --rm sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
 
 # Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"

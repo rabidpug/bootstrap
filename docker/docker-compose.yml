@@ -1,44 +1,48 @@
-version: "3"
+version: "3.4"
+      
+networks:
+  web:
+    external: true
+  gitlab:
+    internal: true
+  sentry:
+    internal: true
+
 x-sentry-base: &sentry-base
-  restart: unless-stopped
   image: sentry
+  restart: unless-stopped
   depends_on:
     - redis
     - postgres
     - memcached
     - smtp
   env_file: ./services/sentry/.env
-  environment:
-    SENTRY_MEMCACHED_HOST: memcached
-    SENTRY_REDIS_HOST: redis
-    SENTRY_POSTGRES_HOST: postgres
-    SENTRY_EMAIL_HOST: smtp
   volumes:
     - ./services/sentry/config:/etc/sentry
     - ./services/sentry/data/sentry:/var/lib/sentry/files
+    
 services:
   traefik:
     image: traefik
     restart: unless-stopped
     networks:
       - web
-    restart: always
     ports:
       - "80:80"
       - "443:443"
       - "23:23"
+    env_file: ./services/traefik/.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./services/traefik/config:/etc/traefik
       - ./services/traefik/data:/letsencrypt
-    env_file: ./services/traefik/.env
+      
   gitlab:
     image: gitlab/gitlab-ce
     restart: unless-stopped
     networks:
       - web
       - gitlab
-    restart: always
     hostname: jcuneo.com
     volumes:
       - ./services/gitlab/config:/etc/gitlab
@@ -55,47 +59,70 @@ services:
       - "traefik.tcp.routers.gitlab-ssh.entrypoints=sshGitlab"
       - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh"
       - "traefik.tcp.services.gitlab-ssh.loadbalancer.server.port=22"
+      
   gitlab-runner:
     image: gitlab/gitlab-runner
     restart: unless-stopped
     networks:
       - gitlab
     volumes:
-      - ./services/gitlab/runner/1:/etc/gitlab-runner
+      - ./services/gitlab/runners/1:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
+      
   smtp:
-    restart: unless-stopped
     image: tianon/exim4
+    restart: unless-stopped
+    networks:
+      sentry:
+        aliases:
+          - smtp
+          
   memcached:
-    restart: unless-stopped
     image: memcached:1.5-alpine
+    restart: unless-stopped
+    networks:
+      sentry:
+        aliases:
+          - memcached
+          
   redis:
-    restart: unless-stopped
     image: redis:3.2-alpine
-  postgres:
     restart: unless-stopped
+    networks:
+      sentry:
+        aliases:
+          - redis
+          
+  postgres:
     image: postgres:9.5
+    restart: unless-stopped
+    networks:
+      sentry:
+        aliases:
+          - postgres
     volumes:
       - ./services/sentry/data/postgres:/var/lib/postgresql/data
+      
   sentry:
     <<: *sentry-base
+    networks:
+      - web
+      - sentry
     command: upgrade --no-input && run web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sentry.rule=Host(`sentry.jcuneo.com`)"
       - "traefik.http.routers.sentry.entrypoints=webSecure"
       - "traefik.http.routers.sentry.tls.certResolver=master"
+      
   sentry-cron:
     <<: *sentry-base
+    networks:
+      - sentry
     command: run cron
+    
   sentry-worker:
     <<: *sentry-base
+    networks:
+      - sentry
     command: run worker
-      
-networks:
-  web:
-    external: true
-  gitlab:
-    internal: true
-  sentry:
-    internal: true
