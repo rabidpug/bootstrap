@@ -86,7 +86,7 @@ add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ ma
 # update and install apps
 apt update
 apt --assume-yes upgrade
-apt --assume-yes install zsh python docker-ce docker-compose do-agent apache2-utils
+apt --assume-yes install zsh python docker-ce docker-compose do-agent
 
 # Add user to docker group
 usermod -aG docker "${USERNAME}"
@@ -113,14 +113,14 @@ rm -rf "${home_directory}/bootstrap"
 echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/services/traefik/.env"
 
 # Add user and password for access to traefik dashboard
-echo $(htpasswd -nb "${USERNAME}" "${ADMIN_PASSWD}") > "${home_directory}/docker/services/traefik/config/users.pw"
+echo "${USERNAME}:$(openssl passwd -apr1 "${ADMIN_PASSWD}")" > "${home_directory}/docker/services/traefik/config/users.pw"
 
 # download config files for Sentry
 curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/docker-entrypoint.sh -o "${home_directory}/docker/services/sentry/config/docker-entrypoint.sh"
 curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
 
 # Generate secret key for Sentry
-echo "system.secret-key: '$(docker run --rm getsentry/sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
+echo "SENTRY_SECRET_KEY=$(docker run --rm getsentry/sentry config generate-secret-key)" > "${home_directory}/docker/services/sentry/.env"
 
 # Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"

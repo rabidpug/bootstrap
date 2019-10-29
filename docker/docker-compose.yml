@@ -1,7 +1,25 @@
 version: "3"
+x-sentry-base: &sentry-base
+  restart: unless-stopped
+  image: sentry
+  depends_on:
+    - redis
+    - postgres
+    - memcached
+    - smtp
+  env_file: ./services/sentry/.env
+  environment:
+    SENTRY_MEMCACHED_HOST: memcached
+    SENTRY_REDIS_HOST: redis
+    SENTRY_POSTGRES_HOST: postgres
+    SENTRY_EMAIL_HOST: smtp
+  volumes:
+    - ./services/sentry/config:/etc/sentry
+    - ./services/sentry/data/sentry:/var/lib/sentry/files
 services:
   traefik:
-    image: traefik:v2.0
+    image: traefik
+    restart: unless-stopped
     networks:
       - web
     restart: always
@@ -16,9 +34,10 @@ services:
     env_file: ./services/traefik/.env
   gitlab:
     image: gitlab/gitlab-ce
+    restart: unless-stopped
     networks:
       - web
-      - internal
+      - gitlab
     restart: always
     hostname: jcuneo.com
     volumes:
@@ -36,24 +55,47 @@ services:
       - "traefik.tcp.routers.gitlab-ssh.entrypoints=sshGitlab"
       - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh"
       - "traefik.tcp.services.gitlab-ssh.loadbalancer.server.port=22"
-  gitlab-runner-1:
+  gitlab-runner:
     image: gitlab/gitlab-runner
+    restart: unless-stopped
     networks:
-      - internal
+      - gitlab
     volumes:
-      - ./volumes/repo/runner-1:/etc/gitlab-runner
+      - ./services/gitlab/runner/1:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
-  gitlab-runner-2:
-    image: gitlab/gitlab-runner
-    networks:
-      - internal
+  smtp:
+    restart: unless-stopped
+    image: tianon/exim4
+  memcached:
+    restart: unless-stopped
+    image: memcached:1.5-alpine
+  redis:
+    restart: unless-stopped
+    image: redis:3.2-alpine
+  postgres:
+    restart: unless-stopped
+    image: postgres:9.5
     volumes:
-      - ./volumes/repo/runner-2:/etc/gitlab-runner
-      - /var/run/docker.sock:/var/run/docker.sock
-      
+      - ./services/sentry/data/postgres:/var/lib/postgresql/data
+  sentry:
+    <<: *sentry-base
+    command: upgrade --no-input && run web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sentry.rule=Host(`sentry.jcuneo.com`)"
+      - "traefik.http.routers.sentry.entrypoints=webSecure"
+      - "traefik.http.routers.sentry.tls.certResolver=master"
+  sentry-cron:
+    <<: *sentry-base
+    command: run cron
+  sentry-worker:
+    <<: *sentry-base
+    command: run worker
       
 networks:
   web:
     external: true
-  internal:
+  gitlab:
+    internal: true
+  sentry:
     internal: true
