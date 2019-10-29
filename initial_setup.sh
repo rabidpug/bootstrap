@@ -5,24 +5,11 @@ set -euo pipefail
 ### SCRIPT VARIABLES ###
 ########################
 
-## USED FOR:
-# Linux sudo user
-# Traefik dashboard user
 USERNAME=***USERNAME***
 
-## USED FOR:
-# Traefik dashboard password
-ADMIN_PASSWD=***ADMIN_PASSWD***
-
-## USED FOR:
-# SSH authorized keys
 PUBLIC_KEYS_TO_ADD=(
-    ***PUBLIC_KEYS***
+    ***PUBLIC_KEYS_TO_ADD***
 )
-
-## USED FOR:
-# Traefik acme dns challenge
-DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
 ####################
 ### SCRIPT LOGIC ###
@@ -44,9 +31,6 @@ else
     # can be set without providing a previous value
     passwd --delete "${USERNAME}"
 fi
-
-# Expire the sudo user's password immediately to force a change
-chage --lastday 0 "${USERNAME}"
 
 # Create SSH directory for sudo user
 home_directory="$(eval echo ~${USERNAME})"
@@ -83,7 +67,6 @@ chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
-sysctl vm.swapiness=10
 
 # Add docker and digital ocean agent repos
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -100,46 +83,11 @@ apt --assume-yes install zsh python docker-ce docker-compose do-agent
 # Add user to docker group
 usermod -aG docker "${USERNAME}"
 
-# Clone & install antigen and fzf
-git clone https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
-git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
-echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
-"${home_directory}/.fzf/install" --all
-
-# personal bootstrap
-git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/bootstrap"
-
-# Move antigen config
-mv "${home_directory}/bootstrap/.antigenrc" "${home_directory}/.antigenrc"
-
-# Move docker config
-mv "${home_directory}/bootstrap/docker" "${home_directory}/docker"
-
-# remove personal bootstrap
-rm -rf "${home_directory}/bootstrap"
-
-# Add digital ocean auth token to traefik .env
-echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/services/traefik/.env"
-
-# Add user and password for access to traefik dashboard
-echo "${USERNAME}:$(openssl passwd -apr1 "${ADMIN_PASSWD}")" > "${home_directory}/docker/services/traefik/config/users.pw"
-
-# download config file for Sentry
-curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
-
-# Generate secret key for Sentry
-
-echo "system.secret-key: '$(docker run --rm sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
-
-# Adjust ownership
-chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
-
 # Change default shell to ZSH
 usermod -s $(which zsh) ${USERNAME}
 
-# initial sentry config
+# Personal bootstrap as new sudo user
+su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && ${home_directory}/bootstrap/bootstrap.sh"
 
-cd "${home_directory}/docker"
-docker network create web
-docker-compose run --rm sentry upgrade --noinput
-docker-compose run --rm sentry createuser --email m@jcuneo.com --password "${ADMIN_PASSWD}" --superuser --no-input
+# Expire the sudo user's password to force a change
+chage --lastday 0 "${USERNAME}"
