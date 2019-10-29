@@ -108,12 +108,13 @@ services:
     networks:
       - web
       - sentry
-    command: upgrade --no-input && run web
+    command: upgrade --noinput && run web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sentry.rule=Host(`sentry.jcuneo.com`)"
       - "traefik.http.routers.sentry.entrypoints=webSecure"
       - "traefik.http.routers.sentry.tls.certResolver=master"
+      - "traefik.http.services.sentry.loadbalancer.server.port=9000"
       
   sentry-cron:
     <<: *sentry-base

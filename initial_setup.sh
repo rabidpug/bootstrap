@@ -128,6 +128,7 @@ echo "${USERNAME}:$(openssl passwd -apr1 "${ADMIN_PASSWD}")" > "${home_directory
 curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
 
 # Generate secret key for Sentry
+
 echo "system.secret-key: '$(docker run --rm sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
 
 # Adjust ownership
@@ -139,5 +140,6 @@ usermod -s $(which zsh) ${USERNAME}
 # initial sentry config
 
 cd "${home_directory}/docker"
+docker network create web
 docker-compose run --rm sentry upgrade --noinput
 docker-compose run --rm sentry createuser --email m@jcuneo.com --password "${ADMIN_PASSWD}" --superuser --no-input
