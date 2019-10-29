@@ -135,3 +135,9 @@ chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
 
 # Change default shell to ZSH
 usermod -s $(which zsh) ${USERNAME}
+
+# initial sentry config
+
+cd "${home_directory}/docker"
+docker-compose run --rm sentry upgrade --noinput
+docker-compose run --rm sentry createuser --email m@jcuneo.com --password "${ADMIN_PASSWD}" --superuser --no-input
