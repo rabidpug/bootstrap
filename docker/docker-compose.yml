@@ -1,5 +1,5 @@
 version: "3.4"
-      
+
 networks:
   web:
     external: true
@@ -20,7 +20,7 @@ x-sentry-base: &sentry-base
   volumes:
     - ./services/sentry/config:/etc/sentry
     - ./services/sentry/data/sentry:/var/lib/sentry/files
-    
+
 services:
   traefik:
     image: traefik
@@ -36,7 +36,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./services/traefik/config:/etc/traefik
       - ./services/traefik/data:/letsencrypt
-      
+
   gitlab:
     image: gitlab/gitlab-ce
     restart: unless-stopped
@@ -59,7 +59,7 @@ services:
       - "traefik.tcp.routers.gitlab-ssh.entrypoints=sshGitlab"
       - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh"
       - "traefik.tcp.services.gitlab-ssh.loadbalancer.server.port=22"
-      
+
   gitlab-runner:
     image: gitlab/gitlab-runner
     restart: unless-stopped
@@ -68,7 +68,7 @@ services:
     volumes:
       - ./services/gitlab/runners/1:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
-      
+
   smtp:
     image: tianon/exim4
     restart: unless-stopped
@@ -76,7 +76,7 @@ services:
       sentry:
         aliases:
           - smtp
-          
+
   memcached:
     image: memcached:1.5-alpine
     restart: unless-stopped
@@ -84,7 +84,7 @@ services:
       sentry:
         aliases:
           - memcached
-          
+
   redis:
     image: redis:3.2-alpine
     restart: unless-stopped
@@ -92,7 +92,7 @@ services:
       sentry:
         aliases:
           - redis
-          
+
   postgres:
     image: postgres:9.5
     restart: unless-stopped
@@ -102,26 +102,25 @@ services:
           - postgres
     volumes:
       - ./services/sentry/data/postgres:/var/lib/postgresql/data
-      
+
   sentry:
     <<: *sentry-base
     networks:
       - web
       - sentry
-    command: upgrade --noinput && run web
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.sentry.rule=Host(`sentry.jcuneo.com`)"
       - "traefik.http.routers.sentry.entrypoints=webSecure"
       - "traefik.http.routers.sentry.tls.certResolver=master"
       - "traefik.http.services.sentry.loadbalancer.server.port=9000"
-      
+
   sentry-cron:
     <<: *sentry-base
     networks:
       - sentry
     command: run cron
-    
+
   sentry-worker:
     <<: *sentry-base
     networks:

@@ -15,9 +15,6 @@ git clone --depth 1 https://github.com/junegunn/fzf.git "${home_directory}/.fzf"
 echo 'source $HOME/.antigenrc' > "${home_directory}/.zshrc"
 "${home_directory}/.fzf/install" --all
 
-# personal bootstrap
-git clone https://github.com/rabidpug/bootstrap.git "${home_directory}/bootstrap"
-
 # Move antigen config
 mv "${home_directory}/bootstrap/.antigenrc" "${home_directory}/.antigenrc"
 

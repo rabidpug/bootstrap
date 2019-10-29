@@ -5,11 +5,24 @@ set -euo pipefail
 ### SCRIPT VARIABLES ###
 ########################
 
+## USED FOR:
+# Linux sudo user
+# traefik dashboard user
 USERNAME=***USERNAME***
 
-PUBLIC_KEYS_TO_ADD=(
-    ***PUBLIC_KEYS_TO_ADD***
+## USED FOR:
+# ssh
+PUBLIC_KEYS=(
+    ***PUBLIC_KEYS***
 )
+
+## USED FOR:
+# Traefik dashboard password
+ADMIN_PASSWD=***ADMIN_PASSWD***
+
+## USED FOR:
+# Traefik acme dns challenge
+DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
 ####################
 ### SCRIPT LOGIC ###
@@ -40,7 +53,7 @@ mkdir --parents "${home_directory}/.ssh"
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
 # Add additional provided public keys
-for pub_key in "${PUBLIC_KEYS_TO_ADD[@]}"; do
+for pub_key in "${PUBLIC_KEYS[@]}"; do
     echo "${pub_key}" >> "${home_directory}/.ssh/authorized_keys"
 done
 
@@ -87,7 +100,7 @@ usermod -aG docker "${USERNAME}"
 usermod -s $(which zsh) ${USERNAME}
 
 # Personal bootstrap as new sudo user
-su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && ${home_directory}/bootstrap/bootstrap.sh"
+su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && chmod +x ${home_directory}/bootstrap/bootstrap.sh && ${home_directory}/bootstrap/bootstrap.sh $ADMIN_PASSWD $DO_AUTH_TOKEN"
 
 # Expire the sudo user's password to force a change
 chage --lastday 0 "${USERNAME}"
