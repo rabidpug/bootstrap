@@ -1,22 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-########################
-### SCRIPT VARIABLES ###
-########################
-
-## USED FOR:
-# Traefik dashboard password
-ADMIN_PASSWD=***ADMIN_PASSWD***
-
-## USED FOR:
-# Traefik acme dns challenge
-DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
-
 ####################
 ### SCRIPT LOGIC ###
 ####################
-
+ADMIN_PASSWD=$1
+DO_AUTH_TOKEN=$2
 USERNAME=$(whoami)
 home_directory="$(eval echo ~${USERNAME})"
 
