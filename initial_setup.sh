@@ -8,7 +8,9 @@ set -euo pipefail
 # Name of the user to create and grant sudo privileges
 USERNAME=***USERNAME***
 
-OTHER_PUBLIC_KEYS_TO_ADD=(
+ADMIN_PASSWD=***ADMIN_PASSWD***
+
+PUBLIC_KEYS_TO_ADD=(
     ***PUBLIC_KEYS***
 )
 
@@ -45,7 +47,7 @@ mkdir --parents "${home_directory}/.ssh"
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
 # Add additional provided public keys
-for pub_key in "${OTHER_PUBLIC_KEYS_TO_ADD[@]}"; do
+for pub_key in "${PUBLIC_KEYS_TO_ADD[@]}"; do
     echo "${pub_key}" >> "${home_directory}/.ssh/authorized_keys"
 done
 
@@ -66,6 +68,14 @@ fi
 ufw allow OpenSSH
 ufw --force enable
 
+# Create swapfile to avoid OOM
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+sysctl vm.swapiness=10
+
 # Add docker and digital ocean agent repos
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 curl https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
@@ -76,7 +86,7 @@ add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ ma
 # update and install apps
 apt update
 apt --assume-yes upgrade
-apt --assume-yes install zsh python docker-ce docker-compose do-agent
+apt --assume-yes install zsh python docker-ce docker-compose do-agent apache2-utils
 
 # Add user to docker group
 usermod -aG docker "${USERNAME}"
@@ -99,10 +109,21 @@ mv "${home_directory}/bootstrap/docker" "${home_directory}/docker"
 # remove personal bootstrap
 rm -rf "${home_directory}/bootstrap"
 
+# Add digital ocean auth token to traefik .env
+echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/services/traefik/.env"
+
+# Add user and password for access to traefik dashboard
+echo $(htpasswd -nb "${USERNAME}" "${ADMIN_PASSWD}") > "${home_directory}/docker/services/traefik/config/users.pw"
+
+# download config files for Sentry
+curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/docker-entrypoint.sh -o "${home_directory}/docker/services/sentry/config/docker-entrypoint.sh"
+curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.conf.py -o "${home_directory}/docker/services/sentry/config/sentry.conf.py"
+
+# Generate secret key for Sentry
+echo "system.secret-key: '$(docker run --rm getsentry/sentry config generate-secret-key)'" >> "${home_directory}/docker/services/sentry/config/config.yml"
+
 # Adjust ownership
 chown -R "${USERNAME}":"${USERNAME}" "${home_directory}"
 
 # Change default shell to ZSH
 usermod -s $(which zsh) ${USERNAME}
-
-echo "DO_AUTH_TOKEN=${DO_AUTH_TOKEN}" > "${home_directory}/docker/traefik.env"

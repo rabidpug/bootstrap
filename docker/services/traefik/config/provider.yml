@@ -3,6 +3,9 @@ http:
     insecure-redirect:
       redirectScheme:
         scheme: https
+    auth:
+      basicAuth:
+        usersFile: /etc/traefik/users.pw
   routers:
     insecure-redirect:
       rule: hostregexp(`{any:.+}`)
@@ -14,6 +17,8 @@ http:
       rule: Host(`router.jcuneo.com`)
       entrypoints: webSecure
       service: api@internal
+      middlewares:
+        - auth
       tls:
         certResolver: master
   services:

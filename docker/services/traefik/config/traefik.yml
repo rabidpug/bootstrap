@@ -16,6 +16,8 @@ certificatesResolvers:
         delayBeforeCheck: 60
 entryPoints:
   web:
-    address: :80
+    address: ":80"
   webSecure:
-    address: :443
+    address: ":443"
+  sshGitlab:
+    address: ":23"

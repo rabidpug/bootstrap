@@ -8,11 +8,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "23:23"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./services/traefik/config:/etc/traefik
-      - ./services/traefik/data/letsencrypt:/letsencrypt
-    env_file: .env
+      - ./services/traefik/data:/letsencrypt
+    env_file: ./services/traefik/.env
   gitlab:
     image: gitlab/gitlab-ce
     networks:
@@ -29,6 +30,12 @@ services:
       - "traefik.http.routers.gitlab.rule=Host(`jcuneo.com`,`www.jcuneo.com`)"
       - "traefik.http.routers.gitlab.entrypoints=webSecure"
       - "traefik.http.routers.gitlab.tls.certResolver=master"
+      - "traefik.http.routers.gitlab.service=gitlab"
+      - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+      - "traefik.tcp.routers.gitlab-ssh.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.gitlab-ssh.entrypoints=sshGitlab"
+      - "traefik.tcp.routers.gitlab-ssh.service=gitlab-ssh"
+      - "traefik.tcp.services.gitlab-ssh.loadbalancer.server.port=22"
   gitlab-runner-1:
     image: gitlab/gitlab-runner
     networks:
