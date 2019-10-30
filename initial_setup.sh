@@ -24,6 +24,10 @@ ADMIN_PASSWD=***ADMIN_PASSWD***
 # Traefik acme dns challenge
 DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
+## USED FOR:
+# Docker data backup and restore
+GITHUB_AUTH_TOKEN=***GITHUB_AUTH_TOKEN***
+
 ####################
 ### SCRIPT LOGIC ###
 ####################
@@ -44,6 +48,9 @@ else
     # can be set without providing a previous value
     passwd --delete "${USERNAME}"
 fi
+
+# Expire the sudo user's password to force a change
+chage --lastday 0 "${USERNAME}"
 
 # Create SSH directory for sudo user
 home_directory="$(eval echo ~${USERNAME})"
@@ -100,7 +107,6 @@ usermod -aG docker "${USERNAME}"
 usermod -s $(which zsh) ${USERNAME}
 
 # Personal bootstrap as new sudo user
-su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && chmod +x ${home_directory}/bootstrap/bootstrap.sh && ${home_directory}/bootstrap/bootstrap.sh $ADMIN_PASSWD $DO_AUTH_TOKEN"
+su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && chmod +x ${home_directory}/bootstrap/bootstrap.sh && ${home_directory}/bootstrap/bootstrap.sh $ADMIN_PASSWD $DO_AUTH_TOKEN $GITHUB_AUTH_TOKEN"
 
-# Expire the sudo user's password to force a change
-chage --lastday 0 "${USERNAME}"
+ 

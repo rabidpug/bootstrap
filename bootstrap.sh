@@ -6,6 +6,7 @@ set -euo pipefail
 ####################
 ADMIN_PASSWD=$1
 DO_AUTH_TOKEN=$2
+GITHUB_AUTH_TOKEN=$3
 USERNAME=$(whoami)
 home_directory="$(eval echo ~${USERNAME})"
 
@@ -37,6 +38,22 @@ curl https://raw.githubusercontent.com/getsentry/sentry/master/docker/sentry.con
 SENTRY_SECRET_KEY=$(docker run --rm sentry config generate-secret-key)
 echo "system.secret-key: '${SENTRY_SECRET_KEY}'" >> "${home_directory}/docker/services/sentry/config/config.yml"
 echo "SENTRY_SECRET_KEY=${SENTRY_SECRET_KEY}" >> "${home_directory}/docker/services/sentry/.env"
+
+# Get data backup release ID
+RELEASE_ID=$(curl -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | fq -r .id)
+
+# get asset details
+ASSETS=($(curl --H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | fq -c '.[] | {name: .name, id: .id}'))
+
+
+# download & extract assets
+for asset in $ASSETS;
+do
+name=$(echo $asset | fq -r .name | sed 's/\..*//')
+id=$(echo $asset | fq -r .id)
+
+;
+done
 
 # initiate docker
 cd "${home_directory}/docker"
