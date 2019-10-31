@@ -28,6 +28,10 @@ export DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 # Docker data backup and restore
 export GITHUB_AUTH_TOKEN=***GITHUB_AUTH_TOKEN***
 
+export SENTRY_HOST=***SENTRY_HOST***
+export GITLAB_HOST=***GITLAB_HOST***
+export TRAEFIK_HOST=***TRAEFIK_HOST***
+
 ####################
 ### SCRIPT LOGIC ###
 ####################
