@@ -8,25 +8,25 @@ set -euo pipefail
 ## USED FOR:
 # Linux sudo user
 # traefik dashboard user
-USERNAME=***USERNAME***
+export USERNAME=***USERNAME***
 
 ## USED FOR:
 # ssh
-PUBLIC_KEYS=(
+export PUBLIC_KEYS=(
     ***PUBLIC_KEYS***
 )
 
 ## USED FOR:
 # Traefik dashboard password
-ADMIN_PASSWD=***ADMIN_PASSWD***
+export ADMIN_PASSWD=***ADMIN_PASSWD***
 
 ## USED FOR:
 # Traefik acme dns challenge
-DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
+export DO_AUTH_TOKEN=***DO_AUTH_TOKEN***
 
 ## USED FOR:
 # Docker data backup and restore
-GITHUB_AUTH_TOKEN=***GITHUB_AUTH_TOKEN***
+export GITHUB_AUTH_TOKEN=***GITHUB_AUTH_TOKEN***
 
 ####################
 ### SCRIPT LOGIC ###
@@ -53,7 +53,7 @@ fi
 chage --lastday 0 "${USERNAME}"
 
 # Create SSH directory for sudo user
-home_directory="$(eval echo ~${USERNAME})"
+export home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 
 # Copy root account public keys
@@ -107,6 +107,6 @@ usermod -aG docker "${USERNAME}"
 usermod -s $(which zsh) ${USERNAME}
 
 # Personal bootstrap as new sudo user
-su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && chmod +x ${home_directory}/bootstrap/bootstrap.sh && ${home_directory}/bootstrap/bootstrap.sh $ADMIN_PASSWD $DO_AUTH_TOKEN $GITHUB_AUTH_TOKEN"
+su ${USERNAME} -c "git clone https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && bash ${home_directory}/bootstrap/bootstrap.sh"
 
  
