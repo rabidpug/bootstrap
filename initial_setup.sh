@@ -89,16 +89,18 @@ swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
 
 # Add docker and digital ocean agent repos
+apt update
+apt --assume-yes upgrade
+apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 curl https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
 add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
-
-
-# update and install apps
+curl -L "https://github.com/docker/compose/releases/download/$(curl https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 apt update
 apt --assume-yes upgrade
-apt --assume-yes install zsh python docker-ce docker-compose do-agent
+apt --assume-yes install zsh python docker-ce docker-compose do-agent jq
 
 # Add user to docker group
 usermod -aG docker "${USERNAME}"
