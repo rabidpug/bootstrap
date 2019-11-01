@@ -92,16 +92,16 @@ swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
 
 echo ">> Installing required packages"
-apt update &> /dev/null
-apt -y upgrade &> /dev/null
-apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common &> /dev/null
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - &> /dev/null
-curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add - &> /dev/null
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge" &> /dev/null
-add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main" &> /dev/null
-apt update &> /dev/null
-apt -y upgrade &> /dev/null
-apt -y install zsh python docker-ce do-agent jq &> /dev/null
+apt update
+apt -y upgrade
+apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
+add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
+apt update
+apt -y upgrade
+apt -y install zsh python docker-ce do-agent jq
 curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
@@ -113,5 +113,3 @@ usermod -s $(which zsh) ${USERNAME}
 
 echo ">> Commencing personal bootstrap as new sudo user"
 su ${USERNAME} -c "git clone -q https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap && bash ${home_directory}/bootstrap/bootstrap.sh"
-
- 
