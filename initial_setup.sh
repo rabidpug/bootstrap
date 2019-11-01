@@ -95,14 +95,14 @@ echo ">> Installing required packages"
 apt update &> /dev/null
 apt -y upgrade &> /dev/null
 apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common &> /dev/null
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
-add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - &> /dev/null
+curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add - &> /dev/null
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge" &> /dev/null
+add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main" &> /dev/null
 apt update &> /dev/null
 apt -y upgrade &> /dev/null
 apt -y install zsh python docker-ce do-agent jq &> /dev/null
-curl -fsSL "https://github.com/docker/compose/releases/download/$(curl https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
 echo ">> Adding user to docker group"
