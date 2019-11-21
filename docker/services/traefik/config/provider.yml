@@ -14,7 +14,7 @@ http:
       middlewares:
         - insecure-redirect
     traefik:
-      rule: Host(`router.jcuneo.com`)
+      rule: Host(`proxy.re.fyi`)
       entrypoints: webSecure
       service: api@internal
       middlewares:

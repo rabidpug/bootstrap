@@ -82,6 +82,8 @@ fi
 
 echo ">> Adding firewall exception for SSH and then enabling UFW firewall"
 ufw allow OpenSSH
+ufw allow 23
+ufw allow 24
 ufw --force enable
 
 echo ">> Creating swapfile to avoid docker OOM"

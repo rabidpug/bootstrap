@@ -21,3 +21,5 @@ entryPoints:
     address: ":443"
   sshGitlab:
     address: ":23"
+  sshTunnel:
+    address: ":24"
