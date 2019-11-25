@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+
+home_directory=
+GITHUB_AUTH_TOKEN=
+
+for i in update {,dist-}upgrade auto{remove,clean}; do apt-get $i -y  >> update.log; done
+
+git -C "${home_directory}/bootstrap" pull -q --autostash
+
+git -C "${home_directory}/.fzf" pull -q
+"${home_directory}/.fzf/install"
+
+docker-compose -f "${home_directory}/docker/docker-compose.yml" down
+
+curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+tar -cpzf /tmp/docker.tar.gz -C "${home_directory}" docker
+
+RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
+
+ASSETS=($(curl -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | . '))
+
+for asset in $ASSETS; do 
+  id=$(echo $asset | jq -r .id)
+  curl -fsSL -X DELETE -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/assets/${id}";
+done
+
+curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" -H "Content-Type: application/octet-stream" --data-binary @/tmp/docker.tar.gz "https://uploads.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets?name=docker.tar.gz"
+
+rm -f /tmp/docker.tar.gz
+
+docker-compose -f "${home_directory}/docker/docker-compose.yml" pull
+
+docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d
