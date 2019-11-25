@@ -3,6 +3,7 @@ set -euo pipefail
 {
 home_directory=
 GITHUB_AUTH_TOKEN=
+
 echo ">> Apt update"
 for i in update {,dist-}upgrade auto{remove,clean}; do
   apt-get $i -y  &> /dev/null;
@@ -25,7 +26,7 @@ chmod +x /usr/local/bin/docker-compose
 echo ">> Create docker backup file"
 tar -cpzf /tmp/docker.tar.gz -C "${home_directory}" docker
 
-echo ">> Clear existing backup file"
+echo ">> Clear existing backup file from repo"
 RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
 
 ASSETS=($(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | . '))
@@ -35,7 +36,7 @@ for asset in $ASSETS; do
   curl -fsSL -X DELETE -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/assets/${id}";
 done
 
-echo ">> Upload new backup file"
+echo ">> Upload new backup file to repo"
 curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" -H "Content-Type: application/octet-stream" --data-binary @/tmp/docker.tar.gz "https://uploads.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets?name=docker.tar.gz" > /dev/null
 
 echo ">> Remove local backup file"

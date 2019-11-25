@@ -110,8 +110,8 @@ echo ">> Installing FZF"
 su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all" &> /dev/null
 
 echo ">> Installing Antigen and add source command to .zshrc"
-git clone -q https://github.com/rabidpug/bootstrap.git "${home_directory}/bootstrap"
-git clone -q https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
+su ${USERNAME} -c "git clone -q https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap"
+su ${USERNAME} -c "git clone -q https://github.com/zsh-users/antigen.git ${home_directory}/antigen"
 echo 'source $HOME/bootstrap/.antigenrc' >> "${home_directory}/.zshrc"
 
 echo ">> Downloading and extracting docker assets"
@@ -140,6 +140,8 @@ echo ">> setting up update backup cron job"
 sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${home_directory}/bootstrap/update_backup"
 
 sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/update_backup"
+
+chown root:root "${home_directory}/bootstrap/update_backup"
 
 ln -s "${home_directory}/bootstrap/update_backup" /etc/cron.daily
 } &> /var/log/initial_setup.log
