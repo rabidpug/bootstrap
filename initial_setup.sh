@@ -105,10 +105,6 @@ echo ">> Installing Antigen and add source command to .zshrc"
 git clone -q https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 echo 'source $HOME/bootstrap/.antigenrc' >> "${home_directory}/.zshrc"
 
-#####################
-### SET UP DOCKER ###
-#####################
-
 echo ">> Downloading and extracting docker assets"
 RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq -r .id)
 
