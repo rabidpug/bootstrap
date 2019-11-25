@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-
+{
 ########################
 ### SCRIPT VARIABLES ###
 ########################
@@ -142,3 +142,4 @@ sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g
 sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/update_backup"
 
 ln -s "${home_directory}/bootstrap/update_backup" /etc/cron.daily
+} &> /var/log/initial_setup.log
