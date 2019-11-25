@@ -5,13 +5,13 @@ set -euo pipefail
 ### SCRIPT VARIABLES ###
 ########################
 
-USERNAME= ###
+USERNAME=
 
 PUBLIC_KEYS=(
-    ###
+    
 )
 
-GITHUB_AUTH_TOKEN=###
+GITHUB_AUTH_TOKEN=
 
 ####################
 ### SCRIPT LOGIC ###
@@ -29,7 +29,7 @@ if [ "${encrypted_root_pw}" != "*" ]; then
     passwd --lock root
 else
     echo ">> Deleting invalid password for user if using keys so that a new password can be set without providing a previous value"
-    passwd --delete "${USERNAME}"
+    passwd --delete "${USERNAME}" > /dev/null
 fi
 
 echo ">> Expiring the sudo user's password to force a change"
@@ -62,23 +62,30 @@ if sshd -t -q; then
 fi
 
 echo ">> Adding firewall exception for SSH and then enabling UFW firewall"
+{
 ufw allow OpenSSH
 ufw allow 23
 ufw allow 24
 ufw --force enable
+} > /dev/null
 
 echo ">> Creating swapfile to avoid docker OOM"
+{
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
 swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
+} > /dev/null
 
 echo ">> Disabling password requirement for sudo"
-echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USERNAME}"
+echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USERNAME}" > /dev/null
+
 echo ">> Setting timezone"
 timedatectl set-timezone Australia/Sydney
+
 echo ">> Installing required packages"
+{
 apt update
 apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -89,6 +96,7 @@ apt update
 apt -y install zsh python docker-ce do-agent jq
 curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
+} &> /dev/null
 
 echo ">> Adding user to docker group"
 usermod -aG docker "${USERNAME}"
@@ -99,9 +107,10 @@ usermod -s $(which zsh) ${USERNAME}
 
 echo ">> Installing FZF"
 
-su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all"
+su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all" &> /dev/null
 
 echo ">> Installing Antigen and add source command to .zshrc"
+git clone -q https://github.com/rabidpug/bootstrap.git "${home_directory}/bootstrap"
 git clone -q https://github.com/zsh-users/antigen.git "${home_directory}/antigen"
 echo 'source $HOME/bootstrap/.antigenrc' >> "${home_directory}/.zshrc"
 
@@ -122,14 +131,14 @@ esac;
 done
 
 echo ">> Creating docker Web network"
-docker network create web
+docker network create web > /dev/null
 
 echo ">> Spinning up docker services"
-docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d
+docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d &> /dev/null
 
 echo ">> setting up update backup cron job"
-sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${home_directory}/bootstrap/update_backup
+sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${home_directory}/bootstrap/update_backup"
 
-sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/update_backup
+sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/update_backup"
 
 ln -s "${home_directory}/bootstrap/update_backup" /etc/cron.daily
