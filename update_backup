@@ -28,7 +28,7 @@ tar -cpzf /tmp/docker.tar.gz -C "${home_directory}" docker
 echo ">> Clear existing backup file"
 RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
 
-ASSETS=($(curl -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | . '))
+ASSETS=($(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | . '))
 
 for asset in $ASSETS; do 
   id=$(echo $asset | jq -r .id)
@@ -36,7 +36,7 @@ for asset in $ASSETS; do
 done
 
 echo ">> Upload new backup file"
-curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" -H "Content-Type: application/octet-stream" --data-binary @/tmp/docker.tar.gz "https://uploads.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets?name=docker.tar.gz"
+curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" -H "Content-Type: application/octet-stream" --data-binary @/tmp/docker.tar.gz "https://uploads.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets?name=docker.tar.gz" > /dev/null
 
 echo ">> Remove local backup file"
 rm -f /tmp/docker.tar.gz
