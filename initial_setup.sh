@@ -17,51 +17,51 @@ GITHUB_AUTH_TOKEN=
 ### SCRIPT LOGIC ###
 ####################
 
-echo ">> Adding sudo user and granting privileges"
+echo ">>[$(date)]: Adding sudo user and granting privileges"
 useradd --create-home --shell "/bin/bash" --groups sudo "${USERNAME}"
 
-echo ">> Checking whether the root account has a real password set"
+echo ">>[$(date)]: Checking whether the root account has a real password set"
 encrypted_root_pw="$(grep root /etc/shadow | cut --delimiter=: --fields=2)"
 
 if [ "${encrypted_root_pw}" != "*" ]; then
-    echo ">> Transfering auto-generated root password to user if present and locking the root account to password-based access"
+    echo ">>[$(date)]: Transfering auto-generated root password to user if present and locking the root account to password-based access"
     echo "${USERNAME}:${encrypted_root_pw}" | chpasswd --encrypted
     passwd --lock root
 else
-    echo ">> Deleting invalid password for user if using keys so that a new password can be set without providing a previous value"
+    echo ">>[$(date)]: Deleting invalid password for user if using keys so that a new password can be set without providing a previous value"
     passwd --delete "${USERNAME}" > /dev/null
 fi
 
-echo ">> Expiring the sudo user's password to force a change"
+echo ">>[$(date)]: Expiring the sudo user's password to force a change"
 chage --lastday 0 "${USERNAME}"
 
-echo ">> Creating SSH directory for sudo user"
+echo ">>[$(date)]: Creating SSH directory for sudo user"
 home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 
-echo ">> Copying root account public keys"
+echo ">>[$(date)]: Copying root account public keys"
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
 
-echo ">> Adding additional provided public keys"
+echo ">>[$(date)]: Adding additional provided public keys"
 for pub_key in "${PUBLIC_KEYS[@]}"; do
     echo "${pub_key}" >> "${home_directory}/.ssh/authorized_keys"
 done
 
-echo ">> Adjusting SSH configuration ownership and permissions"
+echo ">>[$(date)]: Adjusting SSH configuration ownership and permissions"
 chmod 0700 "${home_directory}/.ssh"
 chmod 0600 "${home_directory}/.ssh/authorized_keys"
 chown --recursive "${USERNAME}":"${USERNAME}" "${home_directory}/.ssh"
 
-echo ">> Disabling root SSH login with password"
+echo ">>[$(date)]: Disabling root SSH login with password"
 sed --in-place 's/^PermitRootLogin.*/PermitRootLogin prohibit-password/g' /etc/ssh/sshd_config
 
-echo ">> Disabling all SSH login with password"
+echo ">>[$(date)]: Disabling all SSH login with password"
 sed --in-place 's/^PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
 if sshd -t -q; then
     systemctl restart sshd
 fi
 
-echo ">> Adding firewall exception for SSH and then enabling UFW firewall"
+echo ">>[$(date)]: Adding firewall exception for SSH and then enabling UFW firewall"
 {
 ufw allow OpenSSH
 ufw allow 23
@@ -69,7 +69,7 @@ ufw allow 24
 ufw --force enable
 } > /dev/null
 
-echo ">> Creating swapfile to avoid docker OOM"
+echo ">>[$(date)]: Creating swapfile to avoid docker OOM"
 {
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
@@ -78,13 +78,13 @@ swapon /swapfile
 echo '/swapfile swap swap defaults 0 0' >> /etc/fstab
 } > /dev/null
 
-echo ">> Disabling password requirement for sudo"
+echo ">>[$(date)]: Disabling password requirement for sudo"
 echo "${USERNAME} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/${USERNAME}" > /dev/null
 
-echo ">> Setting timezone"
+echo ">>[$(date)]: Setting timezone"
 timedatectl set-timezone Australia/Sydney
 
-echo ">> Installing required packages"
+echo ">>[$(date)]: Installing required packages"
 {
 apt update
 apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -98,23 +98,23 @@ curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL htt
 chmod +x /usr/local/bin/docker-compose
 } &> /dev/null
 
-echo ">> Adding user to docker group"
+echo ">>[$(date)]: Adding user to docker group"
 usermod -aG docker "${USERNAME}"
 
-echo ">> Changing default shell to ZSH"
+echo ">>[$(date)]: Changing default shell to ZSH"
 chsh --shell $(which zsh)
 usermod -s $(which zsh) ${USERNAME}
 
-echo ">> Installing FZF"
+echo ">>[$(date)]: Installing FZF"
 
 su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all" &> /dev/null
 
-echo ">> Installing Antigen and add source command to .zshrc"
+echo ">>[$(date)]: Installing Antigen and add source command to .zshrc"
 su ${USERNAME} -c "git clone -q https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap"
 su ${USERNAME} -c "git clone -q https://github.com/zsh-users/antigen.git ${home_directory}/antigen"
 echo 'source $HOME/bootstrap/.antigenrc' >> "${home_directory}/.zshrc"
 
-echo ">> Downloading and extracting docker assets"
+echo ">>[$(date)]: Downloading and extracting docker assets"
 RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq -r .id)
 
 ASSETS=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | {name: .name, id: .id}')
@@ -130,13 +130,13 @@ case "$name" in
 esac;
 done
 
-echo ">> Creating docker Web network"
+echo ">>[$(date)]: Creating docker Web network"
 docker network create web > /dev/null
 
-echo ">> Spinning up docker services"
+echo ">>[$(date)]: Spinning up docker services"
 docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d &> /dev/null
 
-echo ">> setting up update backup cron job"
+echo ">>[$(date)]: setting up update backup cron job"
 sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${home_directory}/bootstrap/update_backup"
 
 sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/update_backup"

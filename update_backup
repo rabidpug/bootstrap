@@ -4,12 +4,12 @@ set -euo pipefail
 home_directory=
 GITHUB_AUTH_TOKEN=
 
-echo ">> Apt update"
+echo ">>[$(date)]: Apt update"
 for i in update {,dist-}upgrade auto{remove,clean}; do
   apt-get $i -y  &> /dev/null;
 done
 
-echo ">> Update bootstrap"
+echo ">>[$(date)]: Update bootstrap"
 git -C "${home_directory}/bootstrap" reset --hard -q
 git -C "${home_directory}/bootstrap" clean -xdfq
 git -C "${home_directory}/bootstrap" pull -q
@@ -20,7 +20,7 @@ sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home
 
 chown root:root "${home_directory}/bootstrap/update_backup"
 
-echo ">> Update non-apt apps"
+echo ">>[$(date)]: Update non-apt apps"
 {
 git -C "${home_directory}/.fzf" pull -q
 "${home_directory}/.fzf/install"
@@ -31,10 +31,10 @@ curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL htt
 chmod +x /usr/local/bin/docker-compose
 } &> /dev/null
 
-echo ">> Create docker backup file"
-tar -cpzf /tmp/docker.tar.gz -C "${home_directory}" docker
+echo ">>[$(date)]: Create docker backup file"
+tar -cpzf /tmp/docker.tar.gz -C "${home_directory}" docker &> /dev/null
 
-echo ">> Clear existing backup file from repo"
+echo ">>[$(date)]: Clear existing backup file from repo"
 RELEASE_ID=$(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
 
 ASSETS=($(curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets" | jq -c '.[] | . '))
@@ -44,15 +44,15 @@ for asset in $ASSETS; do
   curl -fsSL -X DELETE -H "Authorization: token ${GITHUB_AUTH_TOKEN}" "https://api.github.com/repos/rabidpug/artifacts/releases/assets/${id}";
 done
 
-echo ">> Upload new backup file to repo"
+echo ">>[$(date)]: Upload new backup file to repo"
 curl -fsSL -H "Authorization: token ${GITHUB_AUTH_TOKEN}" -H "Content-Type: application/octet-stream" --data-binary @/tmp/docker.tar.gz "https://uploads.github.com/repos/rabidpug/artifacts/releases/${RELEASE_ID}/assets?name=docker.tar.gz" > /dev/null
 
-echo ">> Remove local backup file"
+echo ">>[$(date)]: Remove local backup file"
 rm -f /tmp/docker.tar.gz
 
-echo ">> Docker pull"
+echo ">>[$(date)]: Docker pull"
 docker-compose -f "${home_directory}/docker/docker-compose.yml" pull > /dev/null
 
-echo ">> Spin up docker"
+echo ">>[$(date)]: Spin up docker"
 docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d &> /dev/null
 } &> /var/log/update_backup.log
