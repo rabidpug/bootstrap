@@ -4,6 +4,7 @@ antigen use oh-my-zsh
 
 export NVM_AUTO_USE=true
 antigen bundle lukechilds/zsh-nvm
+antigen bundle lukechilds/zsh-better-npm-completion
 antigen bundle git
 antigen bundle docker
 antigen bundle appup
