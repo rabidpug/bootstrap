@@ -2,6 +2,8 @@ source $HOME/antigen/antigen.zsh
 
 antigen use oh-my-zsh
 
+export NVM_AUTO_USE=true
+antigen bundle lukechilds/zsh-nvm
 antigen bundle git
 antigen bundle docker
 antigen bundle appup
