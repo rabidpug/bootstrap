@@ -244,12 +244,12 @@ done
 
 lg '//CRON CONFIG'
 lg 'setting up cronjobs'
-for job in "${home_directory}/bootstrap/cronjobs/*"; do
+find "${home_directory}/bootstrap/cronjobs" -type f | while read job; do
   lg "Update variables for ${job}"
-  sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${home_directory}/bootstrap/cronjobs/${job}"
-  sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${home_directory}/bootstrap/cronjobs/${job}"
+  sed --in-place "s|^GITHUB_AUTH_TOKEN=.*|GITHUB_AUTH_TOKEN=${GITHUB_AUTH_TOKEN}|g" "${job}"
+  sed --in-place "s|^home_directory=.*|home_directory=${home_directory}|g" "${job}"
   lg "Create/update symlink for ${job}"
-  ln -sf "${home_directory}/bootstrap/cronjobs/${job}" /etc/cron.daily
+  ln -sf "${job}" /etc/cron.daily
 done
 
 lg 'Setting owner for cronjobs'
