@@ -48,4 +48,4 @@ docker-compose -f "${home_directory}/docker/docker-compose.yml" pull > /dev/null
 
 lg 'Spin up docker'
 docker-compose -f "${home_directory}/docker/docker-compose.yml" up -d &> /dev/null
-} &> /var/log/update_backup.log
+} &> /var/log/backup_docker.log
