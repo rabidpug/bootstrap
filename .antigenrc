@@ -7,7 +7,7 @@ antigen bundle lukechilds/zsh-nvm
 antigen bundle lukechilds/zsh-better-npm-completion
 antigen bundle git
 antigen bundle docker
-antigen bundle appup
+antigen bundle Cloudstek/zsh-plugin-appup
 antigen bundle unixorn/autoupdate-antigen.zshplugin
 antigen bundle Tarrasch/zsh-bd
 antigen bundle RobSis/zsh-completion-generator
