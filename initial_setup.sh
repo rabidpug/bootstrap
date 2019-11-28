@@ -18,6 +18,7 @@ DOMAINS=(
   staged.run
   jcuneo.com
   mybws.win
+  vsc.fyi
 )
 
 PUBLIC_KEYS=(
@@ -151,8 +152,8 @@ lg 'Installing FZF'
 su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all" &> /dev/null
 
 lg 'Installing Antigen'
-su ${USERNAME} -c "git clone -q https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap"
-su ${USERNAME} -c "git clone -q https://github.com/zsh-users/antigen.git ${home_directory}/antigen"
+su ${USERNAME} -c "git clone -q https://github.com/rabidpug/bootstrap.git ${home_directory}/bootstrap" &> /dev/null
+su ${USERNAME} -c "git clone -q https://github.com/zsh-users/antigen.git ${home_directory}/antigen" &> /dev/null
 echo 'source $HOME/bootstrap/.antigenrc' >> "${home_directory}/.zshrc"
 
 #####################
