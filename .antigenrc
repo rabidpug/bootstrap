@@ -2,9 +2,12 @@ source $HOME/antigen/antigen.zsh
 
 antigen use oh-my-zsh
 
+export NVM_AUTO_USE=true
+antigen bundle lukechilds/zsh-nvm
+antigen bundle lukechilds/zsh-better-npm-completion
 antigen bundle git
 antigen bundle docker
-antigen bundle appup
+antigen bundle Cloudstek/zsh-plugin-appup
 antigen bundle unixorn/autoupdate-antigen.zshplugin
 antigen bundle Tarrasch/zsh-bd
 antigen bundle RobSis/zsh-completion-generator
@@ -13,11 +16,14 @@ antigen bundle hlissner/zsh-autopair
 antigen bundle b4b4r07/enhancd
 antigen bundle changyuheng/fz
 antigen bundle rupa/z
+antigen bundle ascii-soup/zsh-url-highlighter
+antigen bundle akoenig/npm-run.plugin.zsh
 antigen bundle andrewferrier/fzf-z
 antigen bundle zsh-users/zsh-completions
 antigen bundle felixr/docker-zsh-completion
 antigen bundle changyuheng/zsh-interactive-cd
 antigen bundle command-not-found
+antigen bundle ael-code/zsh-colored-man-pages
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search ./zsh-history-substring-search.zsh
@@ -27,4 +33,4 @@ antigen theme https://github.com/denysdovhan/spaceship-prompt spaceship
 
 antigen apply
 
-zstyle :plugin:zsh-completion-generator programs   docker
+zstyle :plugin:zsh-completion-generator programs   docker nvm node npm npx grep ls cat curl cd nano
