@@ -9,6 +9,8 @@ GITHUB_AUTH_TOKEN=
 
 DO_AUTH_TOKEN=
 
+LIVEPATCH_KEY=
+
 USERNAME=m
 
 DOMAINS=(
@@ -96,6 +98,10 @@ lg '//SYSTEM CONFIG'
 lg "Setting timezone to ${TZ}"
 timedatectl set-timezone "${TZ}"
 
+lg 'Setting max watches'
+echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf
+sysctl -p
+
 lg 'Adding firewall exception for SSH and then enabling UFW firewall'
 {
 ufw allow OpenSSH
@@ -118,6 +124,7 @@ lg 'Installing common packages'
 apt update
 apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 } &> /dev/null
+
 lg 'Adding package repositories'
 {
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -125,17 +132,22 @@ curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
 add-apt-repository "deb https://repos.insights.digitalocean.com/apt/do-agent/ main main"
 } &> /dev/null
+
 lg 'Installing advanced packages'
 {
 apt update
 apt -y install zsh python docker-ce do-agent jq
 } &> /dev/null
+
 lg 'Installing docker-compose'
 {
 curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 } &> /dev/null
 
+lg 'Install canonical live patches'
+snap install canonical-livepatch > /dev/null
+canonical-livepatch enable "${LIVEPATCH_KEY}" > /dev/null
 #################
 ### USER APPS ###
 #################
@@ -147,6 +159,9 @@ usermod -aG docker "${USERNAME}"
 lg 'Changing default shell to ZSH'
 chsh --shell "$(command -v zsh)"
 usermod -s "$(command -v zsh)" "${USERNAME}"
+
+lg 'sourcing /etc/profile in .zshrc'
+su ${USERNAME} -c "echo 'source /etc/profile' >> ${home_directory}/.zshrc" &> /dev/null
 
 lg 'Installing FZF'
 su ${USERNAME} -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git ${home_directory}/.fzf && ${home_directory}/.fzf/install --all" &> /dev/null
