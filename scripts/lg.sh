@@ -2,10 +2,10 @@ BS_PATH=/usr/local/bootstrap
 
 source "$BS_PATH/.env"
 
-if [ "$DEBUG" != "1" ]; then
-  exec 3>&1 &>/dev/null
-else
+if [ -z "$DEBUG" ]; then
   exec 3>&1
+else
+  exec 3>&1 &>/dev/null
 fi
 lg() {
   echo ">> [$(date '+%Y-%m-%d %H:%M:%S')]: $@" >&3
