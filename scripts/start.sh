@@ -1,19 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
-S_PATH=/usr/local/bootstrap/scripts
+BS_PATH=/usr/local/bootstrap
 
-source "$S_PATH/lg.sh"
+source "$BS_PATH/.env"
+source "$BS_PATH/scripts/lg.sh"
+
+if [ -z "${DEBUG:0}" ]; then
+  exec 3>&1 &>/dev/null
+else
+  exec 3>&1
+fi
 
 lg "##Create User##"
-bash "$S_PATH/create-user.sh"
+bash "$BS_PATH/scripts/create-user.sh"
 lg "##Install Packages##"
-bash "$S_PATH/install-packages.sh"
+bash "$BS_PATH/scripts/install-packages.sh"
 lg "##User Shell##"
-bash "$S_PATH/user-shell.sh"
+bash "$BS_PATH/scripts/user-shell.sh"
 lg "##Docker Project##"
-bash "$S_PATH/docker-project.sh"
+bash "$BS_PATH/scripts/docker-project.sh"
 lg "##DNS Records##"
-bash "$S_PATH/dns-records.sh"
+bash "$BS_PATH/scripts/dns-records.sh"
 lg "##Cronjobs##"
-bash "$S_PATH/cronjobs.sh"
+bash "$BS_PATH/scripts/cronjobs.sh"
