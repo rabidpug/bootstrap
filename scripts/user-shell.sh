@@ -15,16 +15,16 @@ else
   usermod -s "$(command -v zsh)" "$USERNAME"
 
   lg 'sourcing /etc/profile in .zshrc'
-  su "$USERNAME" -c "echo 'source /etc/profile' >> $home_directory/.zshrc" &>/dev/null
+  su "$USERNAME" -c "echo 'source /etc/profile' >> $home_directory/.zshrc"
 
   lg 'Configuring git identity'
-  su "$USERNAME" -c "git config --global user.email $GIT_EMAIL" &>/dev/null
-  su "$USERNAME" -c "git config --global user.name $GIT_NAME" &>/dev/null
+  su "$USERNAME" -c "git config --global user.email $GIT_EMAIL"
+  su "$USERNAME" -c "git config --global user.name $GIT_NAME"
 
   lg 'Installing FZF'
-  su "$USERNAME" -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git $home_directory/.fzf && $home_directory/.fzf/install --all" &>/dev/null
+  su "$USERNAME" -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git $home_directory/.fzf && $home_directory/.fzf/install --all"
 
   lg 'Installing Antigen'
-  su "$USERNAME" -c "git clone -q https://github.com/zsh-users/antigen.git $home_directory/antigen" &>/dev/null
+  su "$USERNAME" -c "git clone -q https://github.com/zsh-users/antigen.git $home_directory/antigen"
   echo "source $BS_PATH/.antigenrc" >>"$home_directory/.zshrc"
 fi

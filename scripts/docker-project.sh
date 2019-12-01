@@ -32,8 +32,8 @@ else
   done
 
   lg 'Creating docker Web network'
-  docker network create web >/dev/null
+  docker network create web
 
   lg 'Spinning up docker services'
-  docker-compose -f "$home_directory/docker/docker-compose.yml" up -d &>/dev/null
+  docker-compose -f "$home_directory/docker/docker-compose.yml" up -d
 fi

@@ -25,7 +25,7 @@ else
     passwd --lock root
   else
     lg 'Deleting invalid password for sudo user'
-    passwd --delete "$USERNAME" >/dev/null
+    passwd --delete "$USERNAME"
   fi
 
   lg 'Expiring sudo user password'
@@ -58,5 +58,5 @@ else
   fi
 
   lg 'Disabling sudo password requirement for user'
-  echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" >/dev/null
+  echo "$USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME"
 fi

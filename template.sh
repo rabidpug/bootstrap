@@ -19,6 +19,7 @@ GIT_EMAIL=
 DOMAINS=()
 PUBLIC_KEYS=()
 TZ=
+DEBUG=
 EOT
 
 touch /var/log/bootstrap.log

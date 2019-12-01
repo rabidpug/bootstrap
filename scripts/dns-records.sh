@@ -23,7 +23,7 @@ else
     esac
     if [ -z $exists ]; then
       lg "adding $domain to dns"
-      curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"$domain\"}" "https://api.digitalocean.com/v2/domains" >/dev/null
+      curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"$domain\"}" "https://api.digitalocean.com/v2/domains"
     fi
     domain_records=$(curl -fsSL -X GET -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" "https://api.digitalocean.com/v2/domains/$domain/records" | jq -c '.domain_records')
     host_record=$(echo "$domain_records" | jq -c '.[] | select(.type=="A" and .name=="@")')
@@ -35,10 +35,10 @@ else
     if [ "$host_data" != "$public_ip" ]; then
       if [ -z "$host_id" ]; then
         lg "creating host record for $domain > $public_ip"
-        curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"type\":\"A\",\"name\":\"@\",\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records" >/dev/null
+        curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"type\":\"A\",\"name\":\"@\",\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records"
       else
         lg "updating host record for $domain > $public_ip (was $host_data)"
-        curl -fsSL -X PUT -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records/$host_id" >/dev/null
+        curl -fsSL -X PUT -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records/$host_id"
       fi
     else
       lg "host record for $domain up to date"
@@ -46,10 +46,10 @@ else
     if [ "$wildcard_data" != "$public_ip" ]; then
       if [ -z "$wildcard_id" ]; then
         lg "creating wildcard record for $domain > $public_ip"
-        curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"type\":\"A\",\"name\":\"*\",\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records" >/dev/null
+        curl -fsSL -X POST -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"type\":\"A\",\"name\":\"*\",\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records"
       else
         lg "updating wildcard record for $domain > $public_ip (was $wildcard_data)"
-        curl -fsSL -X PUT -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records/$wildcard_id" >/dev/null
+        curl -fsSL -X PUT -H "Authorization: Bearer $DO_AUTH_TOKEN" -H "Content-Type: application/json" -d "{\"data\":\"$public_ip\"}" "https://api.digitalocean.com/v2/domains/$domain/records/$wildcard_id"
       fi
     else
       lg "wildcard record for $domain up to date"
