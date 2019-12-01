@@ -6,7 +6,7 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-if [ -z "${DEBUG:0}" ]; then
+if [ -z "${DEBUG:-}" ]; then
   exec 3>&1 &>/dev/null
 else
   exec 3>&1
