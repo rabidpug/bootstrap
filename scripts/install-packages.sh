@@ -21,7 +21,7 @@ if [ -z "$USERNAME" ]; then
   lg 'Skipping adding user to docker group - No user'
 else
   lg 'Adding user to docker group'
-  usermod -aG docker "${USERNAME}"
+  usermod -aG docker "$USERNAME"
 fi
 
 if [ -z "$TZ" ]; then

@@ -19,7 +19,6 @@ GIT_EMAIL=
 DOMAINS=()
 PUBLIC_KEYS=()
 TZ=
-DEBIAN_FRONTEND=noninteractive
 EOT
 
 touch /var/log/bootstrap.log
