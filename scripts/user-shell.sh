@@ -17,6 +17,10 @@ else
   lg 'sourcing /etc/profile in .zshrc'
   su "$USERNAME" -c "echo 'source /etc/profile' >> $home_directory/.zshrc" &>/dev/null
 
+  lg 'Configuring git identity'
+  su "$USERNAME" -c "git config --global user.email $GIT_EMAIL" &>/dev/null
+  su "$USERNAME" -c "git config --global user.name $GIT_NAME" &>/dev/null
+
   lg 'Installing FZF'
   su "$USERNAME" -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git $home_directory/.fzf && $home_directory/.fzf/install --all" &>/dev/null
 
