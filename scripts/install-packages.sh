@@ -9,11 +9,14 @@ source "$BS_PATH/scripts/lg.sh"
 export DEBIAN_FRONTEND=noninteractive
 
 lg 'Updating & installing common packages'
+apt update
+apt -y upgrade
+apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge"
 apt update
 apt -y upgrade
-apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common tzdata ntp zsh python jq docker-ce
+apt -y install tzdata ntp zsh python jq docker-ce
 
 if [ -z "$USERNAME" ]; then
   lg 'Skipping adding user to docker group - No user'
