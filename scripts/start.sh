@@ -12,15 +12,9 @@ else
   exec 3>&1
 fi
 
-lg "##Create User##"
 bash "$BS_PATH/scripts/create-user.sh"
-lg "##Install Packages##"
 bash "$BS_PATH/scripts/install-packages.sh"
-lg "##User Shell##"
 bash "$BS_PATH/scripts/user-shell.sh"
-lg "##Docker Project##"
 bash "$BS_PATH/scripts/docker-project.sh"
-lg "##DNS Records##"
 bash "$BS_PATH/scripts/dns-records.sh"
-lg "##Cronjobs##"
 bash "$BS_PATH/scripts/cronjobs.sh"

@@ -5,10 +5,10 @@ BS_PATH=/usr/local/bootstrap
 
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
-
+lg '##DNS RECORDS##'
 if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   lg 'Skipping dns record setup - Code server'
-elif [ -z "$DO_AUTH_TOKEN" ]; then
+elif [ -z "${DO_AUTH_TOKEN:-}" ]; then
   lg 'Skipping dns record setup - No auth token'
 else
   lg 'Getting public IP'

@@ -6,11 +6,12 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
+lg '##DOCKER PROJECT##'
 if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   lg 'Skipping docker project setup - Code server'
-elif [ -z "$USERNAME" ]; then
+elif [ -z "${USERNAME:-}" ]; then
   lg 'Skipping docker project setup - No user'
-elif [ -z "$GITHUB_AUTH_TOKEN" ]; then
+elif [ -z "${GITHUB_AUTH_TOKEN:-}" ]; then
   lg 'Skipping docker project setup - No auth token'
 else
   home_directory="$(eval echo ~$USERNAME)"

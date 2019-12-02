@@ -8,6 +8,7 @@ source "$BS_PATH/scripts/lg.sh"
 
 export DEBIAN_FRONTEND=noninteractive
 
+lg '##INSTALL PACKAGES##'
 lg 'Updating & installing common packages'
 apt update
 apt -y upgrade
@@ -18,14 +19,14 @@ apt update
 apt -y upgrade
 apt -y install tzdata ntp zsh python jq docker-ce
 
-if [ -z "$USERNAME" ]; then
+if [ -z "${USERNAME:-}" ]; then
   lg 'Skipping adding user to docker group - No user'
 else
   lg 'Adding user to docker group'
   usermod -aG docker "$USERNAME"
 fi
 
-if [ -z "$TZ" ]; then
+if [ -z "${TZ:-}" ]; then
   lg 'Skipping setting timezone - no timezone'
 else
   lg 'Setting timezone'

@@ -6,7 +6,8 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-if [ -z "$USERNAME" ]; then
+lg '##USER SHELL##'
+if [ -z "${USERNAME:-}" ]; then
   lg 'Skipping configuring user shell - No user'
 else
   home_directory="$(eval echo ~$USERNAME)"

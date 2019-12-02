@@ -22,5 +22,5 @@ TZ=
 DEBUG=
 EOT
 
-touch /var/log/bootstrap.log
-bash $BS_PATH/scripts/start.sh &>/var/log/bootstrap.log
+touch /var/log/bs_init.log
+bash $BS_PATH/scripts/start.sh &>/var/log/bs_init.log

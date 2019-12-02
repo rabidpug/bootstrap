@@ -6,8 +6,8 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-lg '//USER CONFIG'
-if [ -z "$USERNAME" ]; then
+lg '##CREATE USER##'
+if [ -z "${USERNAME:-}" ]; then
   lg 'Skipping - no username provided'
 elif [ -z "$(id -u "$USERNAME" 2>&1 >/dev/null)" ]; then
   lg "Skipping - user $USERNAME already exists"
