@@ -11,10 +11,11 @@ if [ -z "${DEBUG:-}" ]; then
 else
   exec 3>&1
 fi
-
+lg '### BEGINNING BOOTSTRAP ###'
 bash "$BS_PATH/scripts/create-user.sh"
 bash "$BS_PATH/scripts/install-packages.sh"
 bash "$BS_PATH/scripts/user-shell.sh"
 bash "$BS_PATH/scripts/docker-project.sh"
 bash "$BS_PATH/scripts/dns-records.sh"
 bash "$BS_PATH/scripts/cronjobs.sh"
+lg '### BOOTSTRAP COMPLETED ###'
