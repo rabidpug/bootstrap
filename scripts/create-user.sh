@@ -37,12 +37,14 @@ else
 
   lg 'Copying root account public keys'
   cp /root/.ssh/authorized_keys "$home_directory/.ssh"
-
-  lg 'Adding additional provided public keys'
-  for pub_key in "${PUBLIC_KEYS[@]}"; do
-    echo "$pub_key" >>"$home_directory/.ssh/authorized_keys"
-  done
-
+  if [ -z "${PUBLIC_KEYS:-}" ]; then
+    lg 'No additional public keys provided'
+  else
+    lg 'Adding additional provided public keys'
+    for pub_key in "${PUBLIC_KEYS[@]}"; do
+      echo "$pub_key" >>"$home_directory/.ssh/authorized_keys"
+    done
+  fi
   lg 'Adjusting SSH configuration ownership and permissions'
   chmod 0700 "$home_directory/.ssh"
   chmod 0600 "$home_directory/.ssh/authorized_keys"

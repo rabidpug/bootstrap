@@ -10,6 +10,8 @@ if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   lg 'Skipping dns record setup - Code server'
 elif [ -z "${DO_AUTH_TOKEN:-}" ]; then
   lg 'Skipping dns record setup - No auth token'
+elif [ -z "${DOMAINS:-}" ]; then
+  lg 'Skipping dns record setup - No domains'
 else
   lg 'Getting public IP'
   public_ip=$(curl -fsSL http://icanhazip.com)
