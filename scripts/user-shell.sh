@@ -27,6 +27,13 @@ else
 
   lg 'Installing Antigen'
   su "$USERNAME" -c "git clone -q https://github.com/zsh-users/antigen.git $home_directory/antigen"
-  ln -sf "$BS_PATH/.antigenrc" "$home_directory"
-  echo 'source $HOME/.antigenrc' >>"$home_directory/.zshrc"
+
+  find "$BS_PATH/dotfiles" -type f | while read dotfile; do
+    lg "Adding/updating $(basename $dotfile) to .zshrc"
+    ln -sf "$dotfile" "$home_directory"
+    src="source \$HOME/$(basename $dotfile)"
+    if ! grep -q "$src" "$home_directory/.zshrc"; then
+      echo "src" >>"$home_directory/.zshrc"
+    fi
+  done
 fi
