@@ -68,6 +68,6 @@ else
   echo '/swapfile swap swap defaults 0 0' >>/etc/fstab
 
   lg 'Install canonical live patches'
-  snap install canonical-livepatch >/dev/null
-  canonical-livepatch enable "$LIVEPATCH_KEY" >/dev/null
+  snap install canonical-livepatch
+  /snap/bin/canonical-livepatch enable "$LIVEPATCH_KEY"
 fi
