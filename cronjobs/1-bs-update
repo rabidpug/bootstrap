@@ -36,7 +36,7 @@ set -euo pipefail
     home_directory="$(eval echo ~$USERNAME)"
     lg 'Update non-apt apps'
     git -C "$home_directory/.fzf" pull -q
-    "$home_directory/.fzf/install --all"
+    "$home_directory/.fzf/install" --all
 
     curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
