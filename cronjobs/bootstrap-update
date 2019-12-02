@@ -47,7 +47,7 @@ else
     ln -sf "$dotfile" "$home_directory"
     src="source \$HOME/$(basename $dotfile)"
     if ! grep -q "$src" "$home_directory/.zshrc"; then
-      echo "src" >>"$home_directory/.zshrc"
+      echo "$src" >>"$home_directory/.zshrc"
     fi
   done
 
