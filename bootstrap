@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euo pipefail
+
+BS_PATH=/usr/local/bootstrap
+
+source "$BS_PATH/.env"
+source "$BS_PATH/utilities/lg.sh"
+
+if [ -z "${DEBUG:-}" ]; then
+  exec 3>&1 &>/dev/null
+else
+  exec 3>&1
+fi
+while getopts ":a123456" opt; do
+  case $opt in
+  \?)
+    lg 'Unknown argument - accepts a123456'
+    ;;
+  a)
+    lg '### BEGINNING BOOTSTRAP ###'
+    find "$BS_PATH/scripts" -type f | while read script; do
+      bash $script
+    done
+    lg '### BOOTSTRAP COMPLETED ###'
+    ;;
+  +([[:digit:]]))
+    find "$BS_PATH/scripts" -type f -name "$opt-*.sh" | while read script; do
+      bash $script
+    done
+    ;;
+  esac
+done

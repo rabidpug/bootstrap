@@ -4,7 +4,7 @@ set -euo pipefail
   BS_PATH=/usr/local/bootstrap
 
   source "$BS_PATH/.env"
-  source "$BS_PATH/scripts/lg.sh"
+  source "$BS_PATH/utilities/lg.sh"
 
   if [ -z "${DEBUG:-}" ]; then
     exec 3>&1 &>/dev/null
@@ -16,6 +16,12 @@ set -euo pipefail
   lg 'Update bootstrap'
   git -C "$BS_PATH" reset --hard -q
   git -C "$BS_PATH" pull -q
+
+  lg 'Fix scripts executable'
+  chmod +x "$BS_PATH/bootstrap"
+  find "$BS_PATH/scripts" -type f | while read script; do
+    chmod +x $script
+  done
 
   lg 'Update cronjobs'
   find "$BS_PATH/cron" -type d | while read folder; do

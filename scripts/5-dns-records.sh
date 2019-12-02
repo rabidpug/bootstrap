@@ -4,7 +4,7 @@ set -euo pipefail
 BS_PATH=/usr/local/bootstrap
 
 source "$BS_PATH/.env"
-source "$BS_PATH/scripts/lg.sh"
+source "$BS_PATH/utilities/lg.sh"
 
 lg '## BEGINNING DNS RECORDS ##'
 if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then

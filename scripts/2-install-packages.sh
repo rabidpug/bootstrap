@@ -4,7 +4,7 @@ set -euo pipefail
 BS_PATH=/usr/local/bootstrap
 
 source "$BS_PATH/.env"
-source "$BS_PATH/scripts/lg.sh"
+source "$BS_PATH/utilities/lg.sh"
 
 lg '## BEGINNING INSTALL PACKAGES ##'
 lg 'Updating & installing common packages'
