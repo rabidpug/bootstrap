@@ -6,7 +6,7 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-lg '##DOCKER PROJECT##'
+lg '## BEGINNING DOCKER PROJECT ##'
 if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   lg 'Skipping docker project setup - Code server'
 elif [ -z "${USERNAME:-}" ]; then
@@ -38,3 +38,5 @@ else
   lg 'Spinning up docker services'
   docker-compose -f "$home_directory/docker/docker-compose.yml" up -d
 fi
+
+lg '## DOCKER PROJECT COMPLETED ##'

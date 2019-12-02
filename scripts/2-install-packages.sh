@@ -6,10 +6,9 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-export DEBIAN_FRONTEND=noninteractive
-
-lg '##INSTALL PACKAGES##'
+lg '## BEGINNING INSTALL PACKAGES ##'
 lg 'Updating & installing common packages'
+export DEBIAN_FRONTEND=noninteractive
 apt update
 apt -y upgrade
 apt -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
@@ -71,3 +70,5 @@ else
   snap install canonical-livepatch
   /snap/bin/canonical-livepatch enable "$LIVEPATCH_KEY"
 fi
+
+lg '## INSTALL PACKAGES COMPLETED ##'

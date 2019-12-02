@@ -9,6 +9,8 @@ antigen bundle git
 antigen bundle docker
 antigen bundle Cloudstek/zsh-plugin-appup
 antigen bundle unixorn/autoupdate-antigen.zshplugin
+antigen bundle xav-b/zsh-extended-history
+antigen bundle laggardkernel/zsh-thefuck
 antigen bundle Tarrasch/zsh-bd
 antigen bundle RobSis/zsh-completion-generator
 antigen bundle djui/alias-tips

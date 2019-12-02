@@ -1,0 +1,42 @@
+#!/bin/bash
+set -euo pipefail
+{
+  BS_PATH=/usr/local/bootstrap
+
+  source "$BS_PATH/.env"
+  source "$BS_PATH/scripts/lg.sh"
+
+  if [ -z "${DEBUG:-}" ]; then
+    exec 3>&1 &>/dev/null
+  else
+    exec 3>&1
+  fi
+
+  lg '## BEGINNING SELF UPDATE ##'
+  lg 'Update bootstrap'
+  git -C "$BS_PATH" reset --hard -q
+  git -C "$BS_PATH" pull -q
+
+  lg 'Update cronjobs'
+  find "$BS_PATH/cronjobs" -type d | while read folder; do
+    interval=$(basename "$folder")
+    find "$folder" -type f | while read job; do
+      lg "Create/update symlink for $(basename $job) in cron.$interval"
+      chmod +x "$job"
+      ln -sf "$job" "/etc/cron.$interval"
+    done
+  done
+  lg 'Update dotfiles'
+
+  find "$BS_PATH/dotfiles" -type f | while read dotfile; do
+    lg "Adding/updating $(basename $dotfile) to .zshrc"
+    ln -sf "$dotfile" "$home_directory"
+    src="source \$HOME/$(basename $dotfile)"
+    if ! grep -q "$src" "$home_directory/.zshrc"; then
+      echo "$src" >>"$home_directory/.zshrc"
+    fi
+  done
+
+  lg '## SELF UPDATE COMPLETED ##'
+
+} &>>/var/log/bs.log

@@ -12,6 +12,7 @@ set -euo pipefail
     exec 3>&1
   fi
 
+  lg '## BEGINNING DOCKER BACKUP ##'
   if [ -z "$USERNAME" ]; then
     lg 'Skipping docker project backup - No user'
   elif [ -z "$GITHUB_AUTH_TOKEN" ]; then
@@ -48,4 +49,7 @@ set -euo pipefail
   else
     lg 'Skipping docker project backup - No docker folder'
   fi
+
+  lg '## DOCKER BACKUP COMPLETED ##'
+
 } &>>/var/log/bs.log

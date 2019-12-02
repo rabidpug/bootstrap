@@ -12,10 +12,10 @@ else
   exec 3>&1
 fi
 lg '### BEGINNING BOOTSTRAP ###'
-bash "$BS_PATH/scripts/create-user.sh"
-bash "$BS_PATH/scripts/install-packages.sh"
-bash "$BS_PATH/scripts/user-shell.sh"
-bash "$BS_PATH/scripts/docker-project.sh"
-bash "$BS_PATH/scripts/dns-records.sh"
-bash "$BS_PATH/scripts/cronjobs.sh"
+bash "$BS_PATH/scripts/1-create-user.sh"
+bash "$BS_PATH/scripts/2-install-packages.sh"
+bash "$BS_PATH/scripts/3-user-shell.sh"
+bash "$BS_PATH/scripts/4-docker-project.sh"
+bash "$BS_PATH/scripts/5-dns-records.sh"
+bash "$BS_PATH/scripts/6-cronjobs.sh"
 lg '### BOOTSTRAP COMPLETED ###'

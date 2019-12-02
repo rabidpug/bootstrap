@@ -6,7 +6,7 @@ BS_PATH=/usr/local/bootstrap
 source "$BS_PATH/.env"
 source "$BS_PATH/scripts/lg.sh"
 
-lg '##USER SHELL##'
+lg '## BEGINNING USER SHELL ##'
 if [ -z "${USERNAME:-}" ]; then
   lg 'Skipping configuring user shell - No user'
 else
@@ -37,3 +37,5 @@ else
     fi
   done
 fi
+
+lg '## USER SHELL COMPLETED ##'
