@@ -11,10 +11,12 @@ if [ -z "${DEBUG:-}" ]; then
 else
   exec 3>&1
 fi
+
 explain() {
   cat <<EOT >&3
 Uknown argument > Available options:
 -x) Execute all scripts
+-0) Execute 0-configure-self
 -1) Execute 1-create-user
 -2) Execute 2-install-packages
 -3) Execute 3-user-shell
@@ -23,7 +25,8 @@ Uknown argument > Available options:
 -6) Execute 6-cronjobs
 EOT
 }
-while getopts ":x123456" opt; do
+
+while getopts ":x0123456" opt; do
   case $opt in
   \?)
     explain
@@ -31,13 +34,13 @@ while getopts ":x123456" opt; do
   x)
     lg '### BEGINNING BOOTSTRAP ###'
     find "$BS_PATH/scripts" -type f | while read script; do
-      $script
+      bash $script
     done
     lg '### BOOTSTRAP COMPLETED ###'
     ;;
   *)
-    find "$BS_PATH/scripts" -type f -name "$opt-*.sh" | while read script; do
-      $script
+    find "$BS_PATH/scripts" -type f -name "$opt-*" | while read script; do
+      bash $script
     done
     ;;
   esac

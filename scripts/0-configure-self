@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+
+BS_PATH=/usr/local/bootstrap
+
+source "$BS_PATH/.env"
+source "$BS_PATH/utilities/lg.sh"
+
+lg '## BEGINNING CONFIGURING SELF ##'
+
+lg 'Configure log'
+touch /var/log/bs.log
+cat <<EOT >>/etc/logrotate.d/bs
+/var/log/bs.log {
+daily
+copytruncate
+missingok
+dateext
+rotate 7
+compress
+}
+
+EOT
+
+lg 'Making script executable and adding to PATH'
+chmod +x "$BS_PATH/bootstrap"
+echo "export PATH=\$PATH:$BS_PATH" >>/etc/profile
+
+lg '## CONFIGURING SELF COMPLETED COMPLETED ##'
