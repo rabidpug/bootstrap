@@ -11,19 +11,31 @@ if [ -z "${DEBUG:-}" ]; then
 else
   exec 3>&1
 fi
-while getopts ":a123456" opt; do
+explain() {
+  echo <<EOT >&3
+Uknown argument - options:
+-x) Execute all scripts
+-1) Execute 1-create-user
+-2) Execute 2-install-packages
+-3) Execute 3-user-shell
+-4) Execute 4-docker-project
+-5) Execute 5-dns-records
+-6) Execute 6-cronjobs
+EOT
+}
+while getopts ":x123456" opt; do
   case $opt in
   \?)
-    lg 'Unknown argument - accepts a123456'
+    explain
     ;;
-  a)
+  x)
     lg '### BEGINNING BOOTSTRAP ###'
     find "$BS_PATH/scripts" -type f | while read script; do
       bash $script
     done
     lg '### BOOTSTRAP COMPLETED ###'
     ;;
-  +([[:digit:]]))
+  *)
     find "$BS_PATH/scripts" -type f -name "$opt-*.sh" | while read script; do
       bash $script
     done
