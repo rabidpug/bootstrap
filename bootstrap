@@ -33,7 +33,7 @@ while getopts ":x0123456" opt; do
     ;;
   x)
     lg '### BEGINNING BOOTSTRAP ###'
-    find "$BS_PATH/scripts" -type f | while read script; do
+    find "$BS_PATH/scripts" -type f | sort -n | while read script; do
       bash $script
     done
     lg '### BOOTSTRAP COMPLETED ###'
