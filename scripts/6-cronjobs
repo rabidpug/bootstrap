@@ -8,7 +8,7 @@ source "$BS_PATH/utilities/lg.sh"
 
 lg '## BEGINNING CRONJOBS ##'
 
-find "$BS_PATH/cron" -type d | while read folder; do
+find "$BS_PATH/cron/" -mindepth 1 -type d | while read folder; do
   interval=$(basename "$folder")
   find "$folder" -type f | while read job; do
     lg "Create symlink for $(basename $job) in cron.$interval"
