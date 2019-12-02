@@ -16,7 +16,7 @@ set -euo pipefail
     lg 'Skipping docker project backup - No user'
   elif [ -z "$GITHUB_AUTH_TOKEN" ]; then
     lg 'Skipping docker project backup - No auth token'
-  elif [ -d "$home_directory/docker" ]; then
+  elif [ -d "$(eval echo ~$USERNAME)/docker" ]; then
     home_directory="$(eval echo ~$USERNAME)"
 
     lg 'Wind down docker'
