@@ -16,7 +16,7 @@ set -euo pipefail
 
   lg 'Apt update'
   for i in update {,dist-}upgrade auto{remove,clean}; do
-    apt-get $i -y
+    apt -y $i
   done
 
   lg 'Update bootstrap'
@@ -35,7 +35,7 @@ set -euo pipefail
     home_directory="$(eval echo ~$USERNAME)"
     lg 'Update non-apt apps'
     git -C "$home_directory/.fzf" pull -q
-    "$home_directory/.fzf/install"
+    "$home_directory/.fzf/install --all"
 
     curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
@@ -60,4 +60,4 @@ set -euo pipefail
       lg 'Skipping docker project update - No docker folder'
     fi
   fi
-} &>/var/log/bs.log
+} &>>/var/log/bs.log

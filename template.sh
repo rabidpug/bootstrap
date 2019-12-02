@@ -23,4 +23,4 @@ DEBUG=
 EOT
 
 touch /var/log/bs.log
-bash $BS_PATH/scripts/start.sh &>/var/log/bs.log
+bash $BS_PATH/scripts/start.sh &>>/var/log/bs.log

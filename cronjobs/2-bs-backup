@@ -11,7 +11,6 @@ set -euo pipefail
   else
     exec 3>&1
   fi
-  exec &>/var/log/bs.log
 
   if [ -z "$USERNAME" ]; then
     lg 'Skipping docker project backup - No user'
@@ -49,4 +48,4 @@ set -euo pipefail
   else
     lg 'Skipping docker project backup - No docker folder'
   fi
-} &>/var/log/bs.log
+} &>>/var/log/bs.log
