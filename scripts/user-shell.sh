@@ -22,8 +22,11 @@ else
   su "$USERNAME" -c "git config --global user.email $GIT_EMAIL"
   su "$USERNAME" -c "git config --global user.name $GIT_NAME"
 
+  lg 'Installing Z'
+  su "$USERNAME" -c "git clone -q https://github.com/rupa/z.git $home_directory/.z"
+
   lg 'Installing FZF'
-  su "$USERNAME" -c "git clone -q --depth 1 https://github.com/junegunn/fzf.git $home_directory/.fzf && $home_directory/.fzf/install --all"
+  su "$USERNAME" -c "git clone -q https://github.com/junegunn/fzf.git $home_directory/.fzf && $home_directory/.fzf/install --all"
 
   lg 'Installing Antigen'
   su "$USERNAME" -c "git clone -q https://github.com/zsh-users/antigen.git $home_directory/antigen"
