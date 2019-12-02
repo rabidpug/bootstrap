@@ -20,6 +20,7 @@ set -euo pipefail
   done
 
   lg 'Update bootstrap'
+  git -C "$BS_PATH" reset --hard -q
   git -C "$BS_PATH" pull -q
 
   lg 'Update cronjobs'
