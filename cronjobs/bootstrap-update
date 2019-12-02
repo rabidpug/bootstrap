@@ -1,62 +1,63 @@
 #!/bin/bash
 set -euo pipefail
-BS_PATH=/usr/local/bootstrap
+{
+  BS_PATH=/usr/local/bootstrap
 
-source "$BS_PATH/.env"
-source "$BS_PATH/scripts/lg.sh"
+  source "$BS_PATH/.env"
+  source "$BS_PATH/scripts/lg.sh"
 
-if [ -z "${DEBUG:-}" ]; then
-  exec 3>&1 &>/dev/null
-else
-  exec 3>&1
-fi
-exec &>/var/log/bs_cron.log
+  if [ -z "${DEBUG:-}" ]; then
+    exec 3>&1 &>/dev/null
+  else
+    exec 3>&1
+  fi
 
-export DEBIAN_FRONTEND=noninteractive
+  export DEBIAN_FRONTEND=noninteractive
 
-lg 'Apt update'
-for i in update {,dist-}upgrade auto{remove,clean}; do
-  apt-get $i -y
-done
-
-lg 'Update bootstrap'
-git -C "$BS_PATH" pull -q
-
-lg 'Update cronjobs'
-find "$BS_PATH/cronjobs" -type f | while read job; do
-  lg "Create/update symlink for $job"
-  chmod +x "$job"
-  ln -sf "$job" /etc/cron.daily
-done
-
-if [ -z "$USERNAME" ]; then
-  lg 'Skipping - no username provided'
-else
-  home_directory="$(eval echo ~$USERNAME)"
-  lg 'Update non-apt apps'
-  git -C "$home_directory/.fzf" pull -q
-  "$home_directory/.fzf/install"
-
-  curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  chmod +x /usr/local/bin/docker-compose
-
-  lg 'Update dotfiles'
-
-  find "$BS_PATH/dotfiles" -type f | while read dotfile; do
-    lg "Adding/updating $(basename $dotfile) to .zshrc"
-    ln -sf "$dotfile" "$home_directory"
-    src="source \$HOME/$(basename $dotfile)"
-    if ! grep -q "$src" "$home_directory/.zshrc"; then
-      echo "$src" >>"$home_directory/.zshrc"
-    fi
+  lg 'Apt update'
+  for i in update {,dist-}upgrade auto{remove,clean}; do
+    apt-get $i -y
   done
 
-  if [ -d "$home_directory/docker" ]; then
-    lg 'Docker build'
-    docker-compose -f "$home_directory/docker/docker-compose.yml" build
-    lg 'Docker pull'
-    docker-compose -f "$home_directory/docker/docker-compose.yml" pull
+  lg 'Update bootstrap'
+  git -C "$BS_PATH" pull -q
+
+  lg 'Update cronjobs'
+  find "$BS_PATH/cronjobs" -type f | while read job; do
+    lg "Create/update symlink for $job"
+    chmod +x "$job"
+    ln -sf "$job" /etc/cron.daily
+  done
+
+  if [ -z "$USERNAME" ]; then
+    lg 'Skipping - no username provided'
   else
-    lg 'Skipping docker project update - No docker folder'
+    home_directory="$(eval echo ~$USERNAME)"
+    lg 'Update non-apt apps'
+    git -C "$home_directory/.fzf" pull -q
+    "$home_directory/.fzf/install"
+
+    curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+
+    lg 'Update dotfiles'
+
+    find "$BS_PATH/dotfiles" -type f | while read dotfile; do
+      lg "Adding/updating $(basename $dotfile) to .zshrc"
+      ln -sf "$dotfile" "$home_directory"
+      src="source \$HOME/$(basename $dotfile)"
+      if ! grep -q "$src" "$home_directory/.zshrc"; then
+        echo "$src" >>"$home_directory/.zshrc"
+      fi
+    done
+
+    if [ -d "$home_directory/docker" ]; then
+      lg 'Docker build'
+      docker-compose -f "$home_directory/docker/docker-compose.yml" build
+      lg 'Docker pull'
+      docker-compose -f "$home_directory/docker/docker-compose.yml" pull
+    else
+      lg 'Skipping docker project update - No docker folder'
+    fi
   fi
-fi
+} &>/var/log/bs.log
