@@ -24,6 +24,6 @@ EOT
 
 lg 'Making script executable and adding to PATH'
 chmod +x "$BS_PATH/bootstrap"
-echo "export PATH=\$PATH:$BS_PATH" >>/etc/profile
+ln -sf "$BS_PATH/bootstrap" /usr/local/bin
 
 lg '## CONFIGURING SELF COMPLETED COMPLETED ##'

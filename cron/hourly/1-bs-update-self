@@ -17,11 +17,8 @@ set -euo pipefail
   git -C "$BS_PATH" reset --hard -q
   git -C "$BS_PATH" pull -q
 
-  lg 'Fix scripts executable'
+  lg 'Make script executable'
   chmod +x "$BS_PATH/bootstrap"
-  find "$BS_PATH/scripts" -type f | while read script; do
-    chmod +x $script
-  done
 
   lg 'Update cronjobs'
   find "$BS_PATH/cron" -type d | while read folder; do
