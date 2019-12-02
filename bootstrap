@@ -12,8 +12,8 @@ else
   exec 3>&1
 fi
 explain() {
-  echo <<EOT >&3
-Uknown argument - options:
+  cat <<EOT >&3
+Uknown argument > Available options:
 -x) Execute all scripts
 -1) Execute 1-create-user
 -2) Execute 2-install-packages
@@ -31,13 +31,13 @@ while getopts ":x123456" opt; do
   x)
     lg '### BEGINNING BOOTSTRAP ###'
     find "$BS_PATH/scripts" -type f | while read script; do
-      bash $script
+      $script
     done
     lg '### BOOTSTRAP COMPLETED ###'
     ;;
   *)
     find "$BS_PATH/scripts" -type f -name "$opt-*.sh" | while read script; do
-      bash $script
+      $script
     done
     ;;
   esac
