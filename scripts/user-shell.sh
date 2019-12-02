@@ -27,5 +27,6 @@ else
 
   lg 'Installing Antigen'
   su "$USERNAME" -c "git clone -q https://github.com/zsh-users/antigen.git $home_directory/antigen"
-  echo "source $BS_PATH/.antigenrc" >>"$home_directory/.zshrc"
+  ln -sf "$BS_PATH/.antigenrc" "$home_directory"
+  echo 'source $HOME/.antigenrc' >>"$home_directory/.zshrc"
 fi
