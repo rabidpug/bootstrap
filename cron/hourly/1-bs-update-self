@@ -18,7 +18,7 @@ set -euo pipefail
   git -C "$BS_PATH" pull -q
 
   lg 'Make script executable'
-  chmod +x "$BS_PATH/bootstrap"
+  chmod +x "$BS_PATH/bs"
 
   lg 'Update cronjobs'
   find "$BS_PATH/cron/" -mindepth 1 -type d | while read folder; do

@@ -23,7 +23,7 @@ compress
 EOT
 
 lg 'Making script executable and linking in /usr/local/bin'
-chmod +x "$BS_PATH/bootstrap"
-ln -sf "$BS_PATH/bootstrap" /usr/local/bin
+chmod +x "$BS_PATH/bs"
+ln -sf "$BS_PATH/bs" /usr/local/bin
 
 lg '## CONFIGURING SELF COMPLETED COMPLETED ##'

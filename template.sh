@@ -23,4 +23,4 @@ DEBUG=
 EOT
 
 touch /var/log/bs.log
-bash "$BS_PATH/bootstrap" -a &>>/var/log/bs.log
+bash "$BS_PATH/bs" -a &>>/var/log/bs.log
