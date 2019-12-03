@@ -16,5 +16,10 @@ find "$BS_PATH/cron/" -mindepth 1 -type d | while read folder; do
     ln -sf "$job" "/etc/cron.$interval"
   done
 done
-
+if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
+  lg 'Code server - leaving cronjobs at 6am'
+else
+  lg 'Setting cronjobs to run at 4am'
+  sed -i 's/ 6\t/ 4\t/g' /etc/crontab
+fi
 lg '## CRONJOBS COMPLETED ##'
