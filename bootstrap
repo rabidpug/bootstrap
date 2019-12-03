@@ -14,7 +14,7 @@ fi
 
 explain() {
   cat <<EOT >&3
-Uknown argument > Available options:
+Available options:
 -x) Execute all scripts
 -0) Execute 0-configure-self
 -1) Execute 1-create-user
