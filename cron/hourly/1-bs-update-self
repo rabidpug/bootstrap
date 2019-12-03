@@ -36,15 +36,19 @@ set -euo pipefail
   done
 
   lg 'Update dotfiles'
-
-  find "$BS_PATH/dotfiles" -type f | while read dotfile; do
-    lg "Adding/updating $(basename $dotfile) to .zshrc"
-    ln -sf "$dotfile" "$home_directory"
-    src="source \$HOME/$(basename $dotfile)"
-    if ! grep -q "$src" "$home_directory/.zshrc"; then
-      echo "$src" >>"$home_directory/.zshrc"
-    fi
-  done
+  if [ -z "$USERNAME" ]; then
+    lg 'Skipping update dotfiles - No user'
+  else
+    home_directory="$(eval echo ~$USERNAME)"
+    find "$BS_PATH/dotfiles" -type f | while read dotfile; do
+      lg "Adding/updating $(basename $dotfile) to .zshrc"
+      ln -sf "$dotfile" "$home_directory"
+      src="source \$HOME/$(basename $dotfile)"
+      if ! grep -q "$src" "$home_directory/.zshrc"; then
+        echo "$src" >>"$home_directory/.zshrc"
+      fi
+    done
+  fi
 
   lg '## SELF UPDATE COMPLETED ##'
 
