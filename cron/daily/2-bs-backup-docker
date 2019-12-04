@@ -26,6 +26,9 @@ set -euo pipefail
     lg 'Create docker backup file'
     tar -cpzf /tmp/docker.tar.gz -C "$home_directory" docker
 
+    lg 'Spin up docker'
+    docker-compose -f "$home_directory/docker/docker-compose.yml" up -d
+
     lg 'Getting asset release id'
     release_id=$(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
 
@@ -44,8 +47,6 @@ set -euo pipefail
     lg 'Remove local backup file'
     rm -f /tmp/docker.tar.gz
 
-    lg 'Spin up docker'
-    docker-compose -f "$home_directory/docker/docker-compose.yml" up -d
   else
     lg 'Skipping docker project backup - No docker folder'
   fi

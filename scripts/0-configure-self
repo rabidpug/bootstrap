@@ -10,14 +10,14 @@ lg '## BEGINNING CONFIGURING SELF ##'
 
 lg 'Configure log'
 touch /var/log/bs.log
-cat <<EOT >>/etc/logrotate.d/bs
+cat <<EOT >/etc/logrotate.d/bs
 /var/log/bs.log {
 daily
 copytruncate
 missingok
 dateext
 rotate 7
-compress
+nocompress
 }
 
 EOT
