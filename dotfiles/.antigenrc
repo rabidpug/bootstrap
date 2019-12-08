@@ -28,8 +28,7 @@ antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search ./zsh-history-substring-search.zsh
 
-antigen theme agnoster
-antigen theme https://github.com/denysdovhan/spaceship-prompt spaceship
+antigen theme romkatv/powerlevel10k
 
 antigen apply
 
