@@ -43,7 +43,7 @@ if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   apt update
   apt -y install nodejs build-essential fonts-firacode
   home_directory="$(eval echo ~$USERNAME)"
-  touch "$home_direcory/.npm-global"
+  touch "$home_directory/.npm-global"
   echo "PATH=\$PATH:$home_directory/.npm-global/bin" >>/etc/profile
   npm config set prefix "$home_directory/.npm-global"
   npm i -g create-react-app lerna yarn
