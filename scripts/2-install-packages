@@ -42,6 +42,11 @@ if grep -Eq '/(lxc|docker|kubepods)/[[:xdigit:]]{64}' /proc/1/cgroup; then
   curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
   apt update
   apt -y install nodejs build-essential fonts-firacode
+  home_directory="$(eval echo ~$USERNAME)"
+  touch "$home_direcory/.npm-global"
+  echo "PATH=\$PATH:$home_directory/.npm-global/bin" >>/etc/profile
+  npm config set prefix "$home_directory/.npm-global"
+  npm i -g create-react-app lerna yarn
 else
   lg 'Installing dev server packages'
   curl -fsSL https://repos.insights.digitalocean.com/sonar-agent.asc | apt-key add -
