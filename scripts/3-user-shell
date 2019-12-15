@@ -39,6 +39,9 @@ else
       echo "$src" >>"$home_directory/.zshrc"
     fi
   done
+  
+  lg 'triggering zsh source'
+  su "$USERNAME" -s $(command -v zsh) -c "source $home_directory/.zshrc"
 fi
 
 lg '## USER SHELL COMPLETED ##'
