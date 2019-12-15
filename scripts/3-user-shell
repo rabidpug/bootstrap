@@ -15,6 +15,10 @@ else
   lg 'Changing user shell to zsh'
   usermod -s "$(command -v zsh)" "$USERNAME"
 
+  lg "Make sure user owns home dir"
+  chown --recursive "$USERNAME:$USERNAME" "$home_directory"
+  su "$USERNAME" -s $(command -v zsh) -c "echo hi"
+
   lg 'sourcing /etc/profile in .zshrc'
   su "$USERNAME" -c "echo 'source /etc/profile' >> $home_directory/.zshrc"
 
@@ -38,7 +42,4 @@ else
   done
 fi
 
-lg "Make sure user owns home dir"
-chown --recursive "$USERNAME:$USERNAME" "$home_directory"
-su "$USERNAME" -s $(command -v zsh) -c "echo hi"
 lg '## USER SHELL COMPLETED ##'
