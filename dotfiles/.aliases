@@ -44,5 +44,6 @@ function dc() {
       echo "calling $service with $@"
       docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
     fi
+    unset IDLE
   done
 }
