@@ -1,1 +1,48 @@
-alias dc='docker-compose -f $HOME/docker/docker-compose.yml'
+function dc() {
+  services_path="$HOME/project/docker/services"
+  if [ "$1" = "list" ]; then
+    find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
+      service=$(basename "$folder")
+      echo $service
+    done
+    return
+  fi
+  checking_services=1
+  services=()
+  while [ "$checking_services" = "1" ]; do
+    find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
+      service_found=0
+      service=$(basename "$folder")
+      if [ "$service" = "$1" ]; then
+        services=("${services[@]}" "$service")
+        service_found=1
+        shift
+      fi
+      if [ "$service_found" = "0" ]; then
+        checking_services=0
+      fi
+    done
+  done
+  if [ "${#services[@]}" = "0" ]; then
+    find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
+      service=$(basename "$folder")
+      services=("${services[@]}" "$service")
+    done
+  fi
+  for service in "${services[@]}"; do
+    if [ -f "$services_path/$service/.directives" ]; then
+      source "$services_path/$service/.directives"
+    fi
+    proceed=1
+    case "1" in
+    "${IDLE:-}")
+      echo "$service is idle"
+      proceed=0
+      ;;
+    esac
+    if [ "$proceed" = "1" ]; then
+      echo "calling $service with $@"
+      docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
+    fi
+  done
+}
