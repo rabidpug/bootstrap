@@ -1,5 +1,5 @@
 function dc() {
-  services_path="$HOME/project/docker/services"
+  services_path="$HOME/docker/services"
   if [ "$1" = "list" ]; then
     find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
       service=$(basename "$folder")
