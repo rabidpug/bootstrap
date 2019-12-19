@@ -20,7 +20,7 @@ function dc() {
     ;;
   "set")
     item="$2"
-    val="$3"
+    value="$3"
     shift 3
     config=1
     ;;
@@ -80,6 +80,7 @@ function dc() {
       else
         sed -i "s/^$item=.*$/$item=$value/g" "$directives"
       fi
+      echo "set directive $item for $service to $value"
     done
   fi
 }
