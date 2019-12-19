@@ -64,7 +64,7 @@ function dc() {
       proceed=1
       case "1" in
       "${IDLE:-}")
-        skip=("$skip" "$service is idle")
+        skip=("${skip[@]}" "$service is idle")
         proceed=0
         ;;
       esac
@@ -87,11 +87,10 @@ function dc() {
       echo $service
     elif [ "$ld" = "1" ]; then
       if [ -f "$directives" ]; then
-        directs=$(cat "$directives")
         echo "---$service directives---"
         cat "$directives"
       else
-        skip=("$skip" "$service has no directives")
+        skip=("${skip[@]}" "$service has no directives")
       fi
     fi
   done
