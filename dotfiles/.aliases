@@ -5,8 +5,12 @@ function dc() {
       service=$(basename "$folder")
       echo $service
     done
-    return; elif [ "$1" = "edit" ]; then
+    return
+  elif [ "$1" = "edit" ]; then
     nano "$services_path/$2/docker-compose.yml"
+    return
+  elif [ "$1" = "cd" ]; then
+    cd "$services_path/$2"
     return
   fi
   checking_services=1
