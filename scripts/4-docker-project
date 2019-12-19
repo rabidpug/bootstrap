@@ -19,7 +19,7 @@ else
   release_id=$(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq -r .id)
 
   lg 'Getting asset IDs'
-  mapfile -t assets < <(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/$release_id/assets" | jq -c '.[] | {name: .name, id: .id}')
+  mapfile -t assets < <(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/$release_id/assets" | jq -c '.[] | {name: .name, id: .id, label}')
 
   for asset in "${assets[@]}"; do
     name=$(echo "$asset" | jq -r .name)

@@ -30,11 +30,47 @@ set -euo pipefail
     curl -fsSL "https://github.com/docker/compose/releases/download/$(curl -fsSL https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
 
-    if [ -d "$home_directory/docker" ]; then
-      lg 'Docker build'
-      docker-compose -f "$home_directory/docker/docker-compose.yml" build
-      lg 'Docker pull'
-      docker-compose -f "$home_directory/docker/docker-compose.yml" pull
+    if [ -d "$home_directory/docker/services" ]; then
+      services_path="$home_directory/docker/services"
+      find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
+        service=$(basename "$folder")
+        if [ -f "$services_path/$service/.directives" ]; then
+          source "$services_path/$service/.directives"
+        fi
+
+        proceed=1
+        down=0
+        build=0
+        case "1" in
+        "${IDLE:-}")
+          lg "$service is idle"
+          proceed=0
+          ;;
+        "${DOWN:-}")
+          lg "$service will come down during backup"
+          down=1
+          ;;
+        "${BUILD:-}")
+          lg "$service needs to be built"
+          build=1
+          ;;
+        esac
+        if [ "$proceed" = "1" ]; then
+          if [ "$build" = "1" ]; then
+            lg "build $service"
+            docker-compose -f "$services_path/$service/docker-compose.yml" build
+          fi
+          lg "pull $service"
+          docker-compose -f "$services_path/$service/docker-compose.yml" pull
+          if [ "$down" = "0" ]; then
+            lg "update $service"
+            docker-compose -f "$services_path/$service/docker-compose.yml" up -d
+          fi
+        fi
+        unset IDLE
+        unset DOWN
+        unset BUILD
+      done
     else
       lg 'Skipping docker project update - No docker folder'
     fi

@@ -57,12 +57,12 @@ set -euo pipefail
         fi
         lg 'Delete existing remote backup'
         asset_id=$(echo "$assets" | jq -rc "map(select(.label = \"$service\")) | .[] | .id")
-        if [ ! -z ${asset_id:-} ]; then
+        if [ ! -z "${asset_id:-}" ]; then
           curl -fsSL -X DELETE -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/assets/$asset_id"
         fi
 
         lg 'Upload new backup file to repo'
-        curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"/tmp/$service.tar.gz" "https://uploads.github.com/repos/rabidpug/artifacts/releases/$release_id/assets?name=$service.tar.gz&label=$service"
+        curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" -H "Content-Type: application/octet-stream" --data-binary "@/tmp/$service.tar.gz" "https://uploads.github.com/repos/rabidpug/artifacts/releases/$release_id/assets?name=$service.tar.gz&label=$service"
 
         lg 'Remove local backup file'
         rm -f "/tmp/$service.tar.gz"
