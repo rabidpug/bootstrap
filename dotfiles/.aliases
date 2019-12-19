@@ -19,14 +19,16 @@ function dc() {
     return
     ;;
   "set")
-  item="$2"
-  val="$3"
-  shift 3
-  config=1
+    item="$2"
+    val="$3"
+    shift 3
+    config=1
+    ;;
   *)
-  run=1
-  ;;
+    run=1
+    ;;
   esac
+
   checking_services=1
   services=()
   while [ "$checking_services" = "1" ]; do
@@ -50,29 +52,34 @@ function dc() {
     done
   fi
   if [ "$run" = "1" ]; then
-  for service in "${services[@]}"; do
-    if [ -f "$services_path/$service/.directives" ]; then
-      source "$services_path/$service/.directives"
-    fi
-    proceed=1
-    case "1" in
-    "${IDLE:-}")
-      echo "$service is idle"
-      proceed=0
-      ;;
-    esac
-    if [ "$proceed" = "1" ]; then
-      docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
-    fi
-    unset IDLE
-  done
+    for service in "${services[@]}"; do
+      if [ -f "$services_path/$service/.directives" ]; then
+        source "$services_path/$service/.directives"
+      fi
+      proceed=1
+      case "1" in
+      "${IDLE:-}")
+        echo "$service is idle"
+        proceed=0
+        ;;
+      esac
+      if [ "$proceed" = "1" ]; then
+        docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
+      fi
+      unset IDLE
+    done
   elif [ "$config" = 1 ]; then
-  for service in "${services[@]}"; do
-  directives="$services_path/$service/.directives"
-  if [ ! -f "$directives" ]; then
-  touch "$directives"
-  fi
-  
-  done
+    for service in "${services[@]}"; do
+      directives="$services_path/$service/.directives"
+      if [ ! -f "$directives" ]; then
+        touch "$directives"
+      fi
+      exists=$(grep "^$item=.*$" "$directives")
+      if [ -z "$exists" ]; then
+        echo "$item=$value" >>"$directives"
+      else
+        sed -i "s/^$item=.*$/$item=$value/g" "$directives"
+      fi
+    done
   fi
 }
