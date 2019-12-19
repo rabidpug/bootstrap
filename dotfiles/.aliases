@@ -5,6 +5,8 @@ function dc() {
       service=$(basename "$folder")
       echo $service
     done
+    return; elif [ "$1" = "edit" ]; then
+    nano "$services_path/$2/docker-compose.yml"
     return
   fi
   checking_services=1
@@ -41,7 +43,6 @@ function dc() {
       ;;
     esac
     if [ "$proceed" = "1" ]; then
-      echo "calling $service with $@"
       docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
     fi
     unset IDLE
