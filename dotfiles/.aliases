@@ -94,7 +94,7 @@ function dc() {
       fi
     fi
   done
-  if [ ! -z "${skip[@]}" ]; then
+  if [ ! "${#skip[@]}" = "0" ]; then
     for skips in "${skip[@]}"; do
       echo "$skips"
     done
