@@ -55,9 +55,9 @@ set -euo pipefail
           lg "Winding up $service"
           docker-compose -f "$services_path/$service/docker-compose.yml" up -d
         fi
-        lg 'Delete existing remote backup'
-        asset_id=$(echo "$assets" | jq -rc "map(select(.label = \"$service\")) | .[] | .id")
+        asset_id=$(echo "$assets" | jq -rc "map(select(.label == \"$service\")) | .[] | .id")
         if [ ! -z "${asset_id:-}" ]; then
+          lg $(Delete existing remote backup $asset_id)
           curl -fsSL -X DELETE -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/assets/$asset_id"
         fi
 
