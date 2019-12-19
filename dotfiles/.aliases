@@ -18,7 +18,7 @@ function dc() {
     return
     ;;
   "set")
-    item="${2^^}"
+    item=$(echo "$2" | tr '[:lower:]' '[:upper:]')
     value="$3"
     shift 3
     config=1
