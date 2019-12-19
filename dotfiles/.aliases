@@ -54,6 +54,7 @@ function dc() {
       services=("${services[@]}" "$service")
     done
   fi
+  skip=()
   for service in "${services[@]}"; do
     directives="$services_path/$service/.directives"
     if [ "$run" = "1" ]; then
@@ -63,7 +64,7 @@ function dc() {
       proceed=1
       case "1" in
       "${IDLE:-}")
-        echo "$service is idle"
+        skip=("$skip" "$service is idle")
         proceed=0
         ;;
       esac
@@ -86,12 +87,17 @@ function dc() {
       echo $service
     elif [ "$ld" = "1" ]; then
       if [ -f "$directives" ]; then
+        directs=$(cat "$directives")
         echo "---$service directives---"
         cat "$directives"
       else
-        echo "---$service directives---"
-        echo "none set"
+        skip=("$skip" "$service has no directives")
       fi
     fi
   done
+  if [ ! -z "${skip[@]}" ]; then
+    for skip in "${skip[@]}"; do
+      echo "$skip"
+    done
+  fi
 }
