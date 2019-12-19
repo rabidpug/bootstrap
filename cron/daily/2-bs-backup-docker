@@ -25,7 +25,7 @@ set -euo pipefail
     release_id=$(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" https://api.github.com/repos/rabidpug/artifacts/releases/latest | jq .id)
 
     lg 'Getting asset IDs'
-    assets=curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/$release_id/assets" | jq -c .
+    assets=$(curl -fsSL -H "Authorization: token $GITHUB_AUTH_TOKEN" "https://api.github.com/repos/rabidpug/artifacts/releases/$release_id/assets" | jq -c .)
     find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
       service=$(basename "$folder")
       if [ -f "$services_path/$service/.directives" ]; then
