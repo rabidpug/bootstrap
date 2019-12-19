@@ -10,7 +10,12 @@ function dc() {
     ls=1
     ;;
   "edit")
-    nano "$services_path/$2/docker-compose.yml"
+    haspath=$(echo "$2" | grep '/')
+    if [ -z "$haspath" ]; then
+      nano "$services_path/$2/docker-compose.yml"
+    else
+      nano "$services_path/$2"
+    fi
     return
     ;;
   "cd")
