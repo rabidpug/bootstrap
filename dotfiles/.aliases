@@ -1,18 +1,32 @@
 function dc() {
+  config=0
+  run=0
   services_path="$HOME/docker/services"
-  if [ "$1" = "list" ]; then
+  case $1 in
+  "list")
     find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
       service=$(basename "$folder")
       echo $service
     done
     return
-  elif [ "$1" = "edit" ]; then
+    ;;
+  "edit")
     nano "$services_path/$2/docker-compose.yml"
     return
-  elif [ "$1" = "cd" ]; then
+    ;;
+  "cd")
     cd "$services_path/$2"
     return
-  fi
+    ;;
+  "set")
+  item="$2"
+  val="$3"
+  shift 3
+  config=1
+  *)
+  run=1
+  ;;
+  esac
   checking_services=1
   services=()
   while [ "$checking_services" = "1" ]; do
@@ -35,6 +49,7 @@ function dc() {
       services=("${services[@]}" "$service")
     done
   fi
+  if [ "$run" = "1" ]; then
   for service in "${services[@]}"; do
     if [ -f "$services_path/$service/.directives" ]; then
       source "$services_path/$service/.directives"
@@ -51,4 +66,13 @@ function dc() {
     fi
     unset IDLE
   done
+  elif [ "$config" = 1 ]; then
+  for service in "${services[@]}"; do
+  directives="$services_path/$service/.directives"
+  if [ ! -f "$directives" ]; then
+  touch "$directives"
+  fi
+  
+  done
+  fi
 }
