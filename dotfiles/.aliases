@@ -1,14 +1,13 @@
 function dc() {
   config=0
   run=0
+  ls=0
+  ld=0
   services_path="$HOME/docker/services"
   case $1 in
-  "list")
-    find "$services_path" -mindepth 1 -maxdepth 1 -type d | while read folder; do
-      service=$(basename "$folder")
-      echo $service
-    done
-    return
+  "ls")
+    shift
+    ls=1
     ;;
   "edit")
     nano "$services_path/$2/docker-compose.yml"
@@ -23,6 +22,10 @@ function dc() {
     value="$3"
     shift 3
     config=1
+    ;;
+  "ld")
+    shift
+    ld=1
     ;;
   *)
     run=1
@@ -51,10 +54,11 @@ function dc() {
       services=("${services[@]}" "$service")
     done
   fi
-  if [ "$run" = "1" ]; then
-    for service in "${services[@]}"; do
-      if [ -f "$services_path/$service/.directives" ]; then
-        source "$services_path/$service/.directives"
+  for service in "${services[@]}"; do
+    directives="$services_path/$service/.directives"
+    if [ "$run" = "1" ]; then
+      if [ -f "$directives" ]; then
+        source "$directives"
       fi
       proceed=1
       case "1" in
@@ -67,10 +71,7 @@ function dc() {
         docker-compose -f "$services_path/$service/docker-compose.yml" "$@"
       fi
       unset IDLE
-    done
-  elif [ "$config" = 1 ]; then
-    for service in "${services[@]}"; do
-      directives="$services_path/$service/.directives"
+    elif [ "$config" = "1" ]; then
       if [ ! -f "$directives" ]; then
         touch "$directives"
       fi
@@ -81,6 +82,16 @@ function dc() {
         sed -i "s/^$item=.*$/$item=$value/g" "$directives"
       fi
       echo "set directive $item for $service to $value"
-    done
-  fi
+    elif [ "$ls" = "1" ]; then
+      echo $service
+    elif [ "$ld" = "1" ]; then
+      if [ -f "$directives" ]; then
+        echo "---$service directives---"
+        cat "$directives"
+      else
+        echo "---$service directives---"
+        echo "none set"
+      fi
+    fi
+  done
 }
